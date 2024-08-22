@@ -3,6 +3,7 @@ package main
 import (
     "bufio"
     "fmt"
+    "io"
     "io/fs"
     "os"
     "path/filepath"
@@ -35,15 +36,25 @@ func hasTrailingWhitespace(filename string) (bool, error) {
     }
     defer file.Close()
 
-    scanner := bufio.NewScanner(file)
-    for scanner.Scan() {
-        line := scanner.Text()
-        if strings.HasSuffix(line, " ") || strings.HasSuffix(line, "\t") {
+    reader := bufio.NewReader(file)
+    for {
+        line, err := reader.ReadString('\n')
+        // Trim newline characters, so we can accurately check for trailing spaces or tabs
+        trimmedLine := strings.TrimRight(line, "\r\n")
+
+        // Check for trailing whitespace (space or tab)
+        if strings.HasSuffix(trimmedLine, " ") || strings.HasSuffix(trimmedLine, "\t") {
             return true, nil
+        }
+
+        if err == io.EOF {
+            break
+        } else if err != nil {
+            return false, err
         }
     }
 
-    return false, scanner.Err()
+    return false, nil
 }
 
 // walkFunc is the function called for each file in the directory tree.
