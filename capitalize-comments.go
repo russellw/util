@@ -105,9 +105,18 @@ func main() {
 		os.Exit(1)
 	}
 
-	files, err := filepath.Glob(flag.Arg(0))
-	if err != nil {
-		fmt.Println("Error processing files:", err)
+	var files []string
+	for _, arg := range flag.Args() {
+		matches, err := filepath.Glob(arg)
+		if err != nil {
+			fmt.Printf("Error processing pattern %s: %v\n", arg, err)
+			continue
+		}
+		files = append(files, matches...)
+	}
+
+	if len(files) == 0 {
+		fmt.Println("No matching files found")
 		os.Exit(1)
 	}
 
