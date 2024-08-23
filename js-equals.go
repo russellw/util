@@ -83,7 +83,9 @@ func processFile(path string, eqPattern, nePattern *regexp.Regexp, writeBack boo
 
 	// Write back to file if the -w flag was provided
 	if writeBack && containsEqualityOps {
-		err := os.WriteFile(path, []byte(strings.Join(modifiedLines, "\n")), 0644)
+		// Ensure the final output ends with a newline
+		output := strings.Join(modifiedLines, "\n") + "\n"
+		err := os.WriteFile(path, []byte(output), 0644)
 		if err != nil {
 			fmt.Printf("Error writing file %s: %v\n", path, err)
 		} else {
