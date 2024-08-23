@@ -24,7 +24,7 @@ func main() {
 	}
 
 	// Define the regular expressions to match == and != but not === or !==
-	eqPattern := regexp.MustCompile(`(^|[^=])==([^=]|$)`)
+	eqPattern := regexp.MustCompile(`(^|[^!=])==([^=]|$)`)
 	nePattern := regexp.MustCompile(`(^|[^!])!=([^=]|$)`)
 
 	// Process each provided path
