@@ -58,12 +58,15 @@ func processFile(fileName string, writeBack bool) (bool, error) {
 				inBlock = true
 				blockStart = len(lines) - 1
 
+				// Extract leading whitespace
+				leadingWhitespace := line[:strings.Index(line, "// ")]
+
 				// Capitalize the first word if necessary
 				firstWord := strings.Fields(comment)[0]
 				if !isURL(firstWord) && unicode.IsLower(rune(firstWord[0])) {
 					fmt.Printf("%s:%d: %s\n", fileName, blockStart+1, line)
 					capitalized := capitalizeFirstWord(comment)
-					lines[blockStart] = "// " + capitalized
+					lines[blockStart] = leadingWhitespace + "// " + capitalized
 					needsFixing = true
 				}
 			}
