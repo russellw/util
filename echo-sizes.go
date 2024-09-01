@@ -18,7 +18,7 @@ func main() {
 			continue
 		}
 		fileSize := fileInfo.Size()
-		fmt.Printf("%d\t%s\n",fileSize, filePath)
+		fmt.Printf("%d\t%s\n", fileSize, filePath)
 		totalSize += fileSize
 	}
 
