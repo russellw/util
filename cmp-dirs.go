@@ -9,8 +9,8 @@ import (
 
 // FileInfo stores the information of a file
 type FileInfo struct {
-	Path string
-	Size int64
+	Path    string
+	Size    int64
 	ModTime time.Time
 }
 
@@ -72,8 +72,14 @@ func CompareDirectories(dir1, dir2 string) error {
 }
 
 func main() {
-	dir1 := "path/to/directory1"
-	dir2 := "path/to/directory2"
+	// Check for correct number of command line arguments
+	if len(os.Args) != 3 {
+		fmt.Println("Usage: cmp-dirs <directory1> <directory2>")
+		os.Exit(1)
+	}
+
+	dir1 := os.Args[1]
+	dir2 := os.Args[2]
 
 	err := CompareDirectories(dir1, dir2)
 	if err != nil {
