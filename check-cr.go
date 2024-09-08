@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"os"
@@ -40,7 +39,7 @@ func isBinary(file string) bool {
 
 	// Read the entire contents of the file
 	data, err := ioutil.ReadAll(f)
-	if err != nil && err != io.EOF {
+	if err != nil {
 		log.Fatal(err) // Crash the program on error
 	}
 
