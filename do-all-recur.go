@@ -22,6 +22,7 @@ func runProgramOnFile(program string, args []string, filePath string) error {
 
 	// If the command fails, return the error
 	if err != nil {
+		fmt.Println(filePath)
 		if exitError, ok := err.(*exec.ExitError); ok {
 			return fmt.Errorf("program returned non-zero exit code: %v", exitError.ExitCode())
 		}
