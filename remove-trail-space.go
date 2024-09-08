@@ -13,14 +13,32 @@ import (
 	"unicode"
 )
 
-// Detects if a file is binary by reading the first 8000 bytes (like Git does).
+// isBinaryFile detects if a file is binary by first checking its extension
+// against a known list of binary types, and then checking for null bytes.
 func isBinaryFile(file string) (bool, error) {
+	// Known binary file extensions
+	binaryExtensions := map[string]bool{
+		".pdf": true, ".png": true, ".exe": true, ".jpg": true, ".jpeg": true,
+		".gif": true, ".bmp": true, ".zip": true, ".rar": true, ".tar": true,
+		".gz": true, ".7z": true, ".dll": true, ".iso": true, ".mp3": true,
+		".mp4": true, ".avi": true, ".mkv": true, ".mov": true, ".bin": true,
+		".dmg": true, ".class": true, ".so": true, ".o": true, ".obj": true,
+	}
+
+	// Get file extension and convert to lowercase for case-insensitive comparison
+	ext := strings.ToLower(filepath.Ext(file))
+	if binaryExtensions[ext] {
+		return true, nil
+	}
+
+	// Open the file for reading
 	f, err := os.Open(file)
 	if err != nil {
 		return false, err
 	}
 	defer f.Close()
 
+	// Read the first 8000 bytes (like Git does)
 	buf := make([]byte, 8000)
 	n, err := f.Read(buf)
 	if err != nil && err != io.EOF {
@@ -31,6 +49,7 @@ func isBinaryFile(file string) (bool, error) {
 	if bytes.IndexByte(buf[:n], 0) != -1 {
 		return true, nil
 	}
+
 	return false, nil
 }
 
@@ -47,7 +66,6 @@ func processFile(file string, writeChanges bool) error {
 	}
 
 	if isBinary {
-		fmt.Printf("Skipping binary file: %s\n", file)
 		return nil
 	}
 
