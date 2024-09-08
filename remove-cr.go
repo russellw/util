@@ -17,7 +17,7 @@ func main() {
 	flag.Parse()
 
 	// Get list of files, handle Windows-style globbing
-	files := expandGlobs(flag.Args())
+	files := flag.Args()
 
 	if len(files) == 0 {
 		fmt.Println("No files provided.")
@@ -28,20 +28,6 @@ func main() {
 		// Process each file
 		processFile(filename, *write)
 	}
-}
-
-// Expand glob patterns (for Windows globbing)
-func expandGlobs(patterns []string) []string {
-	var files []string
-	for _, pattern := range patterns {
-		matches, err := filepath.Glob(pattern)
-		if err != nil {
-			fmt.Printf("Error in pattern %s: %v\n", pattern, err)
-			continue
-		}
-		files = append(files, matches...)
-	}
-	return files
 }
 
 // Process the file by checking and optionally rewriting
