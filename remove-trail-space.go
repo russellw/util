@@ -5,17 +5,17 @@ import (
 	"bytes"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
 	"unicode"
 )
 
-// isBinaryFile detects if a file is binary by first checking its extension
-// against a known list of binary types, and then checking for null bytes.
-func isBinaryFile(file string) (bool, error) {
+// isBinary detects if a file is binary by first checking its extension
+// against a known list of binary types, and then checking the entire file for null bytes.
+func isBinary(file string) bool {
 	// Known binary file extensions
 	binaryExtensions := map[string]bool{
 		".pdf": true, ".png": true, ".exe": true, ".jpg": true, ".jpeg": true,
@@ -28,29 +28,28 @@ func isBinaryFile(file string) (bool, error) {
 	// Get file extension and convert to lowercase for case-insensitive comparison
 	ext := strings.ToLower(filepath.Ext(file))
 	if binaryExtensions[ext] {
-		return true, nil
+		return true
 	}
 
 	// Open the file for reading
 	f, err := os.Open(file)
 	if err != nil {
-		return false, err
+		log.Fatal(err) // Crash the program on error
 	}
 	defer f.Close()
 
-	// Read the first 8000 bytes (like Git does)
-	buf := make([]byte, 8000)
-	n, err := f.Read(buf)
-	if err != nil && err != io.EOF {
-		return false, err
+	// Read the entire contents of the file
+	data, err := ioutil.ReadAll(f)
+	if err != nil {
+		log.Fatal(err) // Crash the program on error
 	}
 
-	// Check for null bytes in the sample
-	if bytes.IndexByte(buf[:n], 0) != -1 {
-		return true, nil
+	// Check for null bytes in the entire file
+	if bytes.IndexByte(data, 0) != -1 {
+		return true
 	}
 
-	return false, nil
+	return false
 }
 
 // Removes trailing whitespace from a string.
@@ -60,12 +59,7 @@ func trimTrailingWhitespace(line string) string {
 
 // Processes a file to remove trailing whitespace.
 func processFile(file string, writeChanges bool) error {
-	isBinary, err := isBinaryFile(file)
-	if err != nil {
-		return err
-	}
-
-	if isBinary {
+	if isBinary(file) {
 		return nil
 	}
 
