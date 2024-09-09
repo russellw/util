@@ -16,7 +16,7 @@ func main() {
 	write := flag.Bool("w", false, "rewrite files without CR characters")
 	flag.Parse()
 
-	// Get list of files, handle Windows-style globbing
+	// Get list of files
 	files := flag.Args()
 
 	if len(files) == 0 {
