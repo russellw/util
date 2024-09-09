@@ -9,7 +9,7 @@ import (
 )
 
 // Function to execute a program on a file
-func runProgramOnFile(program string, args []string, filePath string) error {
+func runProgramOnFile(program string, args []string, filePath string) {
 	// Append the file path to the args
 	allArgs := append(args, filePath)
 
@@ -20,16 +20,13 @@ func runProgramOnFile(program string, args []string, filePath string) error {
 
 	err := cmd.Run()
 
-	// If the command fails, return the error
 	if err != nil {
 		fmt.Println(filePath)
 		if exitError, ok := err.(*exec.ExitError); ok {
-			return fmt.Errorf("program returned non-zero exit code: %v", exitError.ExitCode())
+			log.Fatalf("program returned non-zero exit code: %v", exitError.ExitCode())
 		}
-		return fmt.Errorf("failed to execute program: %v", err)
+		log.Fatalf("failed to execute program: %v", err)
 	}
-
-	return nil
 }
 
 // Function to recursively traverse the directory and run the program on each file
@@ -41,10 +38,7 @@ func walkDirAndRunProgram(root string, program string, args []string) {
 
 		// If it's a file, run the program on it
 		if !info.IsDir() {
-			err := runProgramOnFile(program, args, path)
-			if err != nil {
-				log.Fatal(err)
-			}
+			runProgramOnFile(program, args, path)
 		}
 
 		return nil
