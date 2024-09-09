@@ -87,7 +87,7 @@ func processFile(file string, writeChanges bool) error {
 	}
 
 	if changed {
-		fmt.Printf("Trailing whitespace found in: %s\n", file)
+		fmt.Println(file)
 		if writeChanges {
 			// Rewriting the file
 			err := ioutil.WriteFile(file, []byte(strings.Join(outputLines, "\n")+"\n"), 0644)
@@ -100,19 +100,12 @@ func processFile(file string, writeChanges bool) error {
 	return nil
 }
 
-// Globs and processes files, checking for binary files and removing trailing whitespace.
+// Processes files, checking for binary files and removing trailing whitespace.
 func processFiles(files []string, writeChanges bool) error {
-	for _, pattern := range files {
-		matches, err := filepath.Glob(pattern)
+	for _, file := range files {
+		err := processFile(file, writeChanges)
 		if err != nil {
-			return err
-		}
-
-		for _, match := range matches {
-			err := processFile(match, writeChanges)
-			if err != nil {
-				fmt.Printf("Error processing file %s: %v\n", match, err)
-			}
+			fmt.Printf("Error processing file %s: %v\n", file, err)
 		}
 	}
 	return nil
