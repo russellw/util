@@ -19,8 +19,7 @@ func main() {
 	paths := flag.Args()
 
 	if len(paths) == 0 {
-		fmt.Println("Please provide a list of files to process.")
-		return
+		log.Fatal("Please provide a list of files to process.")
 	}
 
 	// Define the regular expressions to match == and != but not === or !==
@@ -36,8 +35,7 @@ func main() {
 func processFile(path string, eqPattern, nePattern *regexp.Regexp, writeBack bool) {
 	file, err := os.Open(path)
 	if err != nil {
-		fmt.Printf("Error opening file %s: %v\n", path, err)
-		return
+		log.Fatalf("Error opening file %s: %v\n", path, err)
 	}
 	defer file.Close()
 
@@ -61,8 +59,7 @@ func processFile(path string, eqPattern, nePattern *regexp.Regexp, writeBack boo
 	}
 
 	if err := scanner.Err(); err != nil {
-		fmt.Printf("Error reading file %s: %v\n", path, err)
-		return
+		log.Fatalf("Error reading file %s: %v\n", path, err)
 	}
 
 	// Write back to file if the -w flag was provided
