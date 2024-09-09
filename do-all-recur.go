@@ -33,22 +33,25 @@ func runProgramOnFile(program string, args []string, filePath string) error {
 }
 
 // Function to recursively traverse the directory and run the program on each file
-func walkDirAndRunProgram(root string, program string, args []string) error {
-	return filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+func walkDirAndRunProgram(root string, program string, args []string) {
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
-			return fmt.Errorf("error accessing file path: %v", err)
+			log.Fatalf("error accessing file path: %v", err)
 		}
 
 		// If it's a file, run the program on it
 		if !info.IsDir() {
 			err := runProgramOnFile(program, args, path)
 			if err != nil {
-				return err
+				log.Fatal(err)
 			}
 		}
 
 		return nil
 	})
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {
@@ -68,8 +71,5 @@ func main() {
 	}
 
 	// Traverse the directory tree and run the program on each file
-	err = walkDirAndRunProgram(currentDir, program, args)
-	if err != nil {
-		log.Fatalf("Error: %v", err)
-	}
+	walkDirAndRunProgram(currentDir, program, args)
 }
