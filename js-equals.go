@@ -4,8 +4,8 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"log"
 	"os"
-	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -19,7 +19,7 @@ func main() {
 	paths := flag.Args()
 
 	if len(paths) == 0 {
-		fmt.Println("Please provide a list of files and directories to process.")
+		fmt.Println("Please provide a list of files to process.")
 		return
 	}
 
@@ -29,23 +29,7 @@ func main() {
 
 	// Process each provided path
 	for _, path := range paths {
-		// Walk through the path if it's a directory
-		filepath.Walk(path, func(currentPath string, info os.FileInfo, err error) error {
-			if err != nil {
-				return err
-			}
-
-			// Skip the node_modules directory
-			if info.IsDir() && strings.Contains(info.Name(), "node_modules") {
-				return filepath.SkipDir
-			}
-
-			// Process JavaScript files
-			if !info.IsDir() && strings.HasSuffix(info.Name(), ".js") {
-				processFile(currentPath, eqPattern, nePattern, *writeFlag)
-			}
-			return nil
-		})
+		processFile(path, eqPattern, nePattern, *writeFlag)
 	}
 }
 
@@ -87,9 +71,8 @@ func processFile(path string, eqPattern, nePattern *regexp.Regexp, writeBack boo
 		output := strings.Join(modifiedLines, "\n") + "\n"
 		err := os.WriteFile(path, []byte(output), 0644)
 		if err != nil {
-			fmt.Printf("Error writing file %s: %v\n", path, err)
-		} else {
-			fmt.Printf("File %s modified.\n", path)
+			log.Fatal(err)
 		}
+		fmt.Println(path)
 	}
 }
