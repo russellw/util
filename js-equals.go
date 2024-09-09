@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 )
@@ -33,6 +34,10 @@ func main() {
 }
 
 func processFile(path string, eqPattern, nePattern *regexp.Regexp, writeBack bool) {
+	if filepath.Ext(path) != ".js" {
+		return
+	}
+
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatalf("Error opening file %s: %v\n", path, err)
