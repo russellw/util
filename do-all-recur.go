@@ -31,13 +31,13 @@ func runProgramOnFile(program string, args []string, filePath string) {
 
 // Function to recursively traverse the directory and run the program on each file
 func walkDirAndRunProgram(root string, program string, args []string) {
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+	err := filepath.WalkDir(root, func(path string, d os.DirEntry, err error) error {
 		if err != nil {
 			log.Fatalf("error accessing file path: %v", err)
 		}
 
 		// If it's a file, run the program on it
-		if !info.IsDir() {
+		if !d.IsDir() {
 			runProgramOnFile(program, args, path)
 		}
 
