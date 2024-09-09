@@ -35,8 +35,11 @@ func walkDirAndRunProgram(root string, program string, args []string) {
 		if err != nil {
 			log.Fatalf("error accessing file path: %v", err)
 		}
-		if d.IsDir() && d.Name() == "node_modules" {
-			return filepath.SkipDir
+		if d.IsDir() {
+			switch d.Name() {
+			case ".git", "node_modules":
+				return filepath.SkipDir
+			}
 		}
 
 		// If it's a file, run the program on it
