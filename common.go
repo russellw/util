@@ -47,3 +47,20 @@ func isBinary(file string) bool {
 
 	return false
 }
+
+// isCFamily checks if the given file extension belongs to a language that uses // for single-line comments
+func isCFamily(filename string) bool {
+	// List of file extensions that correspond to C family languages
+	cFamilyExtensions := []string{".c", ".cpp", ".cs", ".java", ".js", ".go", ".h", ".hpp", ".ts"}
+
+	// Get the file extension from the filename
+	ext := filepath.Ext(filename)
+
+	// Check if the extension is in the list of C family extensions
+	for _, validExt := range cFamilyExtensions {
+		if ext == validExt {
+			return true
+		}
+	}
+	return false
+}

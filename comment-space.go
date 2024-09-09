@@ -28,6 +28,10 @@ func main() {
 }
 
 func processFile(filename string, write bool) {
+	if !isCFamily(filename) {
+		return
+	}
+
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
