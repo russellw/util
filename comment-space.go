@@ -48,6 +48,8 @@ func processFile(filename string, write bool) {
 	}
 
 	if changed && write {
+		// In this case it is correct to not explicitly re-add the trailing newline
+		// because the lines were obtained with strings.Split
 		err = ioutil.WriteFile(filename, []byte(strings.Join(output, "\n")), 0644)
 		if err != nil {
 			log.Fatal(err)
