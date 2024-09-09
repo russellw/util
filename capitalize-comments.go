@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -31,10 +32,14 @@ func capitalizeFirstWord(comment string) string {
 }
 
 // Processes a single file
-func processFile(fileName string, writeBack bool) (bool, error) {
+func processFile(fileName string, writeBack bool) {
+	if !isCFamily(fileName) {
+		return
+	}
+
 	file, err := os.Open(fileName)
 	if err != nil {
-		return false, err
+		log.Fatal(err)
 	}
 	defer file.Close()
 
@@ -79,7 +84,7 @@ func processFile(fileName string, writeBack bool) (bool, error) {
 		// Write back to the file
 		file, err := os.Create(fileName)
 		if err != nil {
-			return false, err
+			log.Fatal(err)
 		}
 		defer file.Close()
 
@@ -87,13 +92,11 @@ func processFile(fileName string, writeBack bool) (bool, error) {
 		for _, line := range lines {
 			_, err := writer.WriteString(line + "\n")
 			if err != nil {
-				return false, err
+				log.Fatal(err)
 			}
 		}
 		writer.Flush()
 	}
-
-	return needsFixing, scanner.Err()
 }
 
 func main() {
@@ -101,16 +104,14 @@ func main() {
 	flag.Parse()
 
 	if flag.NArg() == 0 {
-		fmt.Println("No files provided")
-		os.Exit(1)
+		log.Fatal("No files provided")
 	}
 
 	var files []string
 	for _, arg := range flag.Args() {
 		matches, err := filepath.Glob(arg)
 		if err != nil {
-			fmt.Printf("Error processing pattern %s: %v\n", arg, err)
-			continue
+			log.Fatal(err)
 		}
 		files = append(files, matches...)
 	}
@@ -121,13 +122,6 @@ func main() {
 	}
 
 	for _, fileName := range files {
-		needsFixing, err := processFile(fileName, *writeBack)
-		if err != nil {
-			fmt.Printf("Error processing file %s: %v\n", fileName, err)
-			continue
-		}
-		if needsFixing && *writeBack {
-			fmt.Printf("Fixed %s\n", fileName)
-		}
+		processFile(fileName, *writeBack)
 	}
 }
