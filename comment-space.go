@@ -4,7 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
-	"path/filepath"
+	"log"
 	"strings"
 )
 
@@ -17,29 +17,20 @@ func main() {
 	files := flag.Args()
 
 	if len(files) == 0 {
-		fmt.Println("Usage: go run main.go [-w] <files>")
+		fmt.Println("Usage: comment-space [-w] <files>")
 		return
 	}
 
 	// Process each file
-	for _, pattern := range files {
-		matches, err := filepath.Glob(pattern)
-		if err != nil {
-			fmt.Printf("Failed to process pattern %s: %v\n", pattern, err)
-			continue
-		}
-
-		for _, file := range matches {
-			processFile(file, *write)
-		}
+	for _, file := range files {
+		processFile(file, *write)
 	}
 }
 
 func processFile(filename string, write bool) {
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("Failed to read file %s: %v\n", filename, err)
-		return
+		log.Fatal(err)
 	}
 
 	lines := strings.Split(string(data), "\n")
@@ -59,7 +50,7 @@ func processFile(filename string, write bool) {
 	if changed && write {
 		err = ioutil.WriteFile(filename, []byte(strings.Join(output, "\n")), 0644)
 		if err != nil {
-			fmt.Printf("Failed to write file %s: %v\n", filename, err)
+			log.Fatal(err)
 		}
 	}
 }

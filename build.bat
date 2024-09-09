@@ -1,1 +1,2 @@
-go build  -ldflags "-s -w" %*
+go build  -ldflags "-s -w" %*||exit /b
+move *.exe \b
