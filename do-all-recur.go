@@ -49,21 +49,17 @@ func walkDirAndRunProgram(root string, program string, args []string) {
 }
 
 func main() {
-	// Check if at least two arguments (program and one arg) are provided
-	if len(os.Args) < 2 {
-		log.Fatalf("Usage: %s program arg1 arg2... \n", os.Args[0])
+	if len(os.Args) < 3 {
+		log.Fatalf("Usage: %s dir program arg1 arg2... \n", os.Args[0])
 	}
+
+	// Directory
+	dir := os.Args[1]
 
 	// Program and its arguments
-	program := os.Args[1]
-	args := os.Args[2:]
-
-	// Current directory
-	currentDir, err := os.Getwd()
-	if err != nil {
-		log.Fatalf("Failed to get current directory: %v", err)
-	}
+	program := os.Args[2]
+	args := os.Args[3:]
 
 	// Traverse the directory tree and run the program on each file
-	walkDirAndRunProgram(currentDir, program, args)
+	walkDirAndRunProgram(dir, program, args)
 }
