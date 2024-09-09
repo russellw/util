@@ -9,6 +9,15 @@ import (
 	"strings"
 )
 
+var ignored = map[string]struct{}{
+	".git": {}, "node_modules": {}, "__pycache__": {},
+}
+
+func ignore(dir string) bool {
+	_, exists := ignored[dir]
+	return exists
+}
+
 // Known binary file extensions
 var binaryExtensions = map[string]struct{}{
 	".pdf": {}, ".png": {}, ".exe": {}, ".jpg": {}, ".jpeg": {},

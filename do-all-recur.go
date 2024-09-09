@@ -35,12 +35,13 @@ func walkDirAndRunProgram(root string, program string, args []string) {
 		if err != nil {
 			log.Fatalf("error accessing file path: %v", err)
 		}
-
-		// If it's a file, run the program on it
-		if !d.IsDir() {
+		if d.IsDir() {
+			if ignore(d.Name()) {
+				return filepath.SkipDir
+			}
+		} else {
 			runProgramOnFile(program, args, path)
 		}
-
 		return nil
 	})
 	if err != nil {
