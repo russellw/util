@@ -10,21 +10,21 @@ import (
 )
 
 // Known binary file extensions
-var binaryExtensions = map[string]bool{
-	".pdf": true, ".png": true, ".exe": true, ".jpg": true, ".jpeg": true,
-	".gif": true, ".bmp": true, ".zip": true, ".rar": true, ".tar": true,
-	".gz": true, ".7z": true, ".dll": true, ".iso": true, ".mp3": true,
-	".mp4": true, ".avi": true, ".mkv": true, ".mov": true, ".bin": true,
-	".dmg": true, ".class": true, ".so": true, ".o": true, ".obj": true,
+var binaryExtensions = map[string]struct{}{
+	".pdf": {}, ".png": {}, ".exe": {}, ".jpg": {}, ".jpeg": {},
+	".gif": {}, ".bmp": {}, ".zip": {}, ".rar": {}, ".tar": {},
+	".gz": {}, ".7z": {}, ".dll": {}, ".iso": {}, ".mp3": {},
+	".mp4": {}, ".avi": {}, ".mkv": {}, ".mov": {}, ".bin": {},
+	".dmg": {}, ".class": {}, ".so": {}, ".o": {}, ".obj": {},
 }
 
 // isBinary detects if a file is binary by first checking its extension
 // against a known list of binary types, and then checking the entire file for null bytes.
 func isBinary(file string) bool {
-
 	// Get file extension and convert to lowercase for case-insensitive comparison
 	ext := strings.ToLower(filepath.Ext(file))
-	if binaryExtensions[ext] {
+	_, exists := binaryExtensions[ext]
+	if exists {
 		return true
 	}
 
