@@ -15,6 +15,15 @@ type Chunk struct {
 	lines []string
 }
 
+// Known binary file extensions
+var binaryExtensions = map[string]struct{}{
+	".pdf": {}, ".png": {}, ".exe": {}, ".jpg": {}, ".jpeg": {},
+	".gif": {}, ".bmp": {}, ".zip": {}, ".rar": {}, ".tar": {},
+	".gz": {}, ".7z": {}, ".dll": {}, ".iso": {}, ".mp3": {},
+	".mp4": {}, ".avi": {}, ".mkv": {}, ".mov": {}, ".bin": {},
+	".dmg": {}, ".class": {}, ".so": {}, ".o": {}, ".obj": {},
+}
+
 var ignored = map[string]struct{}{
 	".git": {}, "node_modules": {}, "__pycache__": {},
 }
@@ -34,15 +43,6 @@ func trimBlankLines(lines []string) []string {
 func ignore(dir string) bool {
 	_, exists := ignored[dir]
 	return exists
-}
-
-// Known binary file extensions
-var binaryExtensions = map[string]struct{}{
-	".pdf": {}, ".png": {}, ".exe": {}, ".jpg": {}, ".jpeg": {},
-	".gif": {}, ".bmp": {}, ".zip": {}, ".rar": {}, ".tar": {},
-	".gz": {}, ".7z": {}, ".dll": {}, ".iso": {}, ".mp3": {},
-	".mp4": {}, ".avi": {}, ".mkv": {}, ".mov": {}, ".bin": {},
-	".dmg": {}, ".class": {}, ".so": {}, ".o": {}, ".obj": {},
 }
 
 // isBinary detects if a file is binary by first checking its extension
