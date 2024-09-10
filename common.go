@@ -77,12 +77,12 @@ func isBinary(file string) bool {
 }
 
 // isCFamily checks if the given file extension belongs to a language that uses // for single-line comments
-func isCFamily(filename string) bool {
+func isCFamily(path string) bool {
 	// List of file extensions that correspond to C family languages
 	cFamilyExtensions := []string{".c", ".cpp", ".cs", ".java", ".js", ".go", ".h", ".hpp", ".ts"}
 
-	// Get the file extension from the filename
-	ext := filepath.Ext(filename)
+	// Get the file extension from the path
+	ext := filepath.Ext(path)
 
 	// Check if the extension is in the list of C family extensions
 	for _, validExt := range cFamilyExtensions {
@@ -98,6 +98,8 @@ func readLines(path string) []string {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
+
 	var lines []string
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
@@ -106,6 +108,36 @@ func readLines(path string) []string {
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
-	file.Close()
 	return lines
+}
+
+func writeLines(path string, lines []string) {
+	// Create or open the file for writing
+	file, err := os.Create(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	// Create a new writer
+	writer := bufio.NewWriter(file)
+	for _, line := range lines {
+		// Write the line without concatenating the newline
+		_, err := writer.WriteString(line)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		// Write the newline separately
+		_, err = writer.WriteString("\n")
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	// Flush any buffered data to the file
+	err = writer.Flush()
+	if err != nil {
+		log.Fatal(err)
+	}
 }
