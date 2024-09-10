@@ -11,6 +11,23 @@ import (
 var writeBack bool
 var fnRe = regexp.MustCompile(`function\s+(\w+)`)
 
+// The input string may or may not contain a JavaScript function declaration
+// Returns the function name if so, otherwise the empty string
+func beginFn(s string) string {
+	match := fnRe.FindStringSubmatch(s)
+	if len(match) > 1 {
+		return match[1] // Return the function name (first captured group)
+	}
+	return ""
+}
+
+func endFn(s string) EndSpecialKind {
+	if s == "}" {
+		return endSpecialInclude
+	}
+	return endSpecialNo
+}
+
 func main() {
 	flag.BoolVar(&writeBack, "w", false, "write modified files back to disk")
 	flag.Parse()
@@ -28,5 +45,6 @@ func processFile(path string) {
 		return
 	}
 	lines := readLines(path)
+	chunks := parseChunks(isComment, beginFn, endFn, lines)
 	fmt.Println(path)
 }
