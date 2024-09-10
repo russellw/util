@@ -16,6 +16,14 @@ type Chunk struct {
 	lines []string
 }
 
+type EndChunkStatus int
+
+const (
+	endChunkNo EndChunkStatus = iota
+	endChunkInclude
+	endChunkExclude
+)
+
 var commentRe = regexp.MustCompile(`\s*//`)
 
 // Known binary file extensions
@@ -29,6 +37,19 @@ var binaryExtensions = map[string]struct{}{
 
 var ignored = map[string]struct{}{
 	".git": {}, "node_modules": {}, "__pycache__": {},
+}
+
+func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
+	if len(lines) == 0 {
+		return chunks
+	}
+	chunk := Chunk{name: name, lines: lines}
+	return append(chunks, chunk)
+}
+
+func parseChunks(isComment func(string) bool, beginsChunk func(string) string, endsChunk func(string) EndChunkStatus, lines []string) []Chunk {
+	var chunks []Chunk
+	return chunks
 }
 
 func isComment(s string) bool {
