@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 )
 
@@ -14,6 +15,8 @@ type Chunk struct {
 	name  string
 	lines []string
 }
+
+var commentRe = regexp.MustCompile(`\s*//`)
 
 // Known binary file extensions
 var binaryExtensions = map[string]struct{}{
@@ -26,6 +29,10 @@ var binaryExtensions = map[string]struct{}{
 
 var ignored = map[string]struct{}{
 	".git": {}, "node_modules": {}, "__pycache__": {},
+}
+
+func isComment(s string) bool {
+	return commentRe.MatchString(s)
 }
 
 func trimBlankLines(lines []string) []string {

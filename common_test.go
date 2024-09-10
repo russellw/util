@@ -52,3 +52,29 @@ func TestTrimBlankLines(t *testing.T) {
 		})
 	}
 }
+
+// TestIsComment checks various cases for the isComment function
+func TestIsComment(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected bool
+	}{
+		{"// This is a comment", true},
+		{"  // Indented comment", true},
+		{"This is not a comment", false},
+		{"//", true},
+		{"  //", true},
+		{" //Partial comment", true},
+		{"/* Block comment */", false},
+		{"  /* Not a line comment */", false},
+	}
+
+	for _, test := range tests {
+		t.Run(test.input, func(t *testing.T) {
+			result := isComment(test.input)
+			if result != test.expected {
+				t.Errorf("For input '%s', expected %v but got %v", test.input, test.expected, result)
+			}
+		})
+	}
+}
