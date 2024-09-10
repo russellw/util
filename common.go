@@ -57,7 +57,7 @@ func parseChunks(isComment func(string) bool, beginSpecial func(string) string, 
 			j++
 		}
 		k := j
-		for i < j && !isComment(lines[j-1]) {
+		for i < j && isComment(lines[j-1]) {
 			j--
 		}
 		chunks = appendChunk(chunks, "", lines[i:j])

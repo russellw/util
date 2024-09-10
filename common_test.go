@@ -78,3 +78,134 @@ func TestIsComment(t *testing.T) {
 		})
 	}
 }
+
+func TestParseChunks_NoSpecialChunks(t *testing.T) {
+	isComment := func(s string) bool { return false }
+	beginSpecial := func(s string) string { return "" }
+	endSpecial := func(s string) EndSpecialKind { return endSpecialNo }
+
+	lines := []string{
+		"line 1",
+		"line 2",
+		"line 3",
+	}
+
+	expected := []Chunk{
+		{name: "", lines: []string{"line 1", "line 2", "line 3"}},
+	}
+
+	result := parseChunks(isComment, beginSpecial, endSpecial, lines)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}
+
+func TestParseChunks_WithSpecialChunks(t *testing.T) {
+	isComment := func(s string) bool { return false }
+	beginSpecial := func(s string) string {
+		if s == "special start" {
+			return "special"
+		}
+		return ""
+	}
+	endSpecial := func(s string) EndSpecialKind {
+		if s == "special end" {
+			return endSpecialInclude
+		}
+		return endSpecialNo
+	}
+
+	lines := []string{
+		"line 1",
+		"special start",
+		"special content",
+		"special end",
+		"line 2",
+	}
+
+	expected := []Chunk{
+		{name: "", lines: []string{"line 1"}},
+		{name: "special", lines: []string{"special start", "special content", "special end"}},
+		{name: "", lines: []string{"line 2"}},
+	}
+
+	result := parseChunks(isComment, beginSpecial, endSpecial, lines)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}
+
+func TestParseChunks_ExcludeEndSpecial(t *testing.T) {
+	isComment := func(s string) bool { return false }
+	beginSpecial := func(s string) string {
+		if s == "special start" {
+			return "special"
+		}
+		return ""
+	}
+	endSpecial := func(s string) EndSpecialKind {
+		if s == "special end" {
+			return endSpecialExclude
+		}
+		return endSpecialNo
+	}
+
+	lines := []string{
+		"line 1",
+		"special start",
+		"special content",
+		"special end",
+		"line 2",
+	}
+
+	expected := []Chunk{
+		{name: "", lines: []string{"line 1"}},
+		{name: "special", lines: []string{"special start", "special content"}},
+		{name: "", lines: []string{"special end", "line 2"}},
+	}
+
+	result := parseChunks(isComment, beginSpecial, endSpecial, lines)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}
+
+func TestParseChunks_WithComments(t *testing.T) {
+	isComment := func(s string) bool {
+		return s == "# comment"
+	}
+	beginSpecial := func(s string) string { return "" }
+	endSpecial := func(s string) EndSpecialKind { return endSpecialNo }
+
+	lines := []string{
+		"line 1",
+		"# comment",
+		"line 2",
+		"line 3",
+	}
+
+	expected := []Chunk{
+		{name: "", lines: []string{"line 1"}},
+		{name: "", lines: []string{"line 2", "line 3"}},
+	}
+
+	result := parseChunks(isComment, beginSpecial, endSpecial, lines)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}
+
+func TestParseChunks_EmptyLines(t *testing.T) {
+	isComment := func(s string) bool { return false }
+	beginSpecial := func(s string) string { return "" }
+	endSpecial := func(s string) EndSpecialKind { return endSpecialNo }
+
+	lines := []string{}
+
+	expected := []Chunk{}
+
+	result := parseChunks(isComment, beginSpecial, endSpecial, lines)
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}
