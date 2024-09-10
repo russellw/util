@@ -185,8 +185,7 @@ func TestParseChunks_WithComments(t *testing.T) {
 	}
 
 	expected := []Chunk{
-		{name: "", lines: []string{"line 1"}},
-		{name: "", lines: []string{"line 2", "line 3"}},
+		{name: "", lines: []string{"line 1", "# comment", "line 2", "line 3"}},
 	}
 
 	result := parseChunks(isComment, beginSpecial, endSpecial, lines)
