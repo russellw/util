@@ -10,6 +10,11 @@ import (
 	"strings"
 )
 
+type Chunk struct {
+	name  string
+	lines []string
+}
+
 var ignored = map[string]struct{}{
 	".git": {}, "node_modules": {}, "__pycache__": {},
 }

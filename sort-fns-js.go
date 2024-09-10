@@ -9,7 +9,6 @@ import (
 )
 
 var writeBack bool
-var lines []string
 var fnRe = regexp.MustCompile(`function\s+(\w+)`)
 
 func main() {
@@ -28,6 +27,6 @@ func processFile(path string) {
 	if filepath.Ext(path) != ".js" {
 		return
 	}
-	lines = readLines(path)
+	lines := readLines(path)
 	fmt.Println(path)
 }
