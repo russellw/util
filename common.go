@@ -19,6 +19,18 @@ var ignored = map[string]struct{}{
 	".git": {}, "node_modules": {}, "__pycache__": {},
 }
 
+func trimBlankLines(lines []string) []string {
+	// Iterate from the end of the slice and find the first non-blank line
+	for i := len(lines) - 1; i >= 0; i-- {
+		if strings.TrimSpace(lines[i]) != "" {
+			// Return the slice up to and including the last non-blank line
+			return lines[:i+1]
+		}
+	}
+	// If all lines are blank, return an empty slice
+	return []string{}
+}
+
 func ignore(dir string) bool {
 	_, exists := ignored[dir]
 	return exists
