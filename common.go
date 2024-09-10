@@ -51,7 +51,7 @@ func parseChunks(isComment func(string) bool, beginSpecial func(string) string, 
 	n := len(lines)
 	var chunks []Chunk
 	for i := 0; i < n; {
-		//non-special chunk?
+		// non-special chunk?
 		j := i
 		for j < n && beginSpecial(lines[j]) == "" {
 			j++
@@ -63,7 +63,7 @@ func parseChunks(isComment func(string) bool, beginSpecial func(string) string, 
 		chunks = appendChunk(chunks, "", lines[i:j])
 		i = j
 
-		//special chunk?
+		// special chunk?
 		if i == n {
 			break
 		}
