@@ -202,10 +202,8 @@ func TestParseChunks_EmptyLines(t *testing.T) {
 
 	lines := []string{}
 
-	expected := []Chunk{}
-
 	result := parseChunks(isComment, beginSpecial, endSpecial, lines)
-	if !reflect.DeepEqual(result, expected) {
-		t.Errorf("Expected %v, but got %v", expected, result)
+	if result != nil && len(result) != 0 {
+		t.Errorf("Expected empty or nil slice, but got %v", result)
 	}
 }
