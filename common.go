@@ -16,12 +16,12 @@ type Chunk struct {
 	lines []string
 }
 
-type EndChunkStatus int
+type EndSpecialStatus int
 
 const (
-	endChunkNo EndChunkStatus = iota
-	endChunkInclude
-	endChunkExclude
+	endSpecialNo EndSpecialStatus = iota
+	endSpecialInclude
+	endSpecialExclude
 )
 
 var commentRe = regexp.MustCompile(`\s*//`)
@@ -47,8 +47,26 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 	return append(chunks, chunk)
 }
 
-func parseChunks(isComment func(string) bool, beginsChunk func(string) string, endsChunk func(string) EndChunkStatus, lines []string) []Chunk {
+func parseChunks(isComment func(string) bool, beginSpecial func(string) string, endSpecial func(string) EndSpecialStatus, lines []string) []Chunk {
+	n := len(lines)
 	var chunks []Chunk
+	for i := 0; ; {
+		//non-special chunk?
+		j := i
+		for j < n && !beginSpecial(lines[j]) {
+			j++
+		}
+		k := j
+		for i < j && !isComment(lines[j-1]) {
+			j--
+		}
+		chunks = appendChunk(chunks, nil, lines[i:j])
+
+		//special chunk?
+		if i == n {
+			break
+		}
+	}
 	return chunks
 }
 
