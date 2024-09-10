@@ -1,17 +1,14 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"log"
-	"os"
 	"path/filepath"
-	"regexp"
-	"strings"
 )
 
 var writeBack bool
+var lines []string
 
 func main() {
 	flag.BoolVar(&writeBack, "w", false, "write modified files back to disk")
@@ -20,13 +17,14 @@ func main() {
 	if len(files) == 0 {
 		log.Fatal("No files were specified")
 	}
-	for _, file := range files {
-		processFile(file)
+	for _, path := range files {
+		processFile(path)
 	}
 }
 
-func processFile(file string) {
-	if filepath.Ext(file) != ".js" {
+func processFile(path string) {
+	if filepath.Ext(path) != ".js" {
 		return
 	}
+	lines = readLines(path)
 }

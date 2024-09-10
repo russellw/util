@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"io/ioutil"
 	"log"
@@ -73,4 +74,21 @@ func isCFamily(filename string) bool {
 		}
 	}
 	return false
+}
+
+func readLines(path string) []string {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	var lines []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+	file.Close()
+	return lines
 }
