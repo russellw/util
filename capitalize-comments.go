@@ -11,11 +11,6 @@ import (
 	"unicode"
 )
 
-// Checks if the string is a URL
-func isURL(text string) bool {
-	return strings.HasPrefix(text, "http://") || strings.HasPrefix(text, "https://")
-}
-
 // Capitalizes the first word of the comment if needed
 func capitalizeFirstWord(comment string) string {
 	if isURL(comment) {
@@ -29,6 +24,38 @@ func capitalizeFirstWord(comment string) string {
 		}
 	}
 	return string(runes)
+}
+
+// Checks if the string is a URL
+func isURL(text string) bool {
+	return strings.HasPrefix(text, "http://") || strings.HasPrefix(text, "https://")
+}
+
+func main() {
+	writeBack := flag.Bool("w", false, "write result to the file")
+	flag.Parse()
+
+	if flag.NArg() == 0 {
+		log.Fatal("No files provided")
+	}
+
+	var files []string
+	for _, arg := range flag.Args() {
+		matches, err := filepath.Glob(arg)
+		if err != nil {
+			log.Fatal(err)
+		}
+		files = append(files, matches...)
+	}
+
+	if len(files) == 0 {
+		fmt.Println("No matching files found")
+		os.Exit(1)
+	}
+
+	for _, fileName := range files {
+		processFile(fileName, *writeBack)
+	}
 }
 
 // Processes a single file
@@ -96,32 +123,5 @@ func processFile(fileName string, writeBack bool) {
 			}
 		}
 		writer.Flush()
-	}
-}
-
-func main() {
-	writeBack := flag.Bool("w", false, "write result to the file")
-	flag.Parse()
-
-	if flag.NArg() == 0 {
-		log.Fatal("No files provided")
-	}
-
-	var files []string
-	for _, arg := range flag.Args() {
-		matches, err := filepath.Glob(arg)
-		if err != nil {
-			log.Fatal(err)
-		}
-		files = append(files, matches...)
-	}
-
-	if len(files) == 0 {
-		fmt.Println("No matching files found")
-		os.Exit(1)
-	}
-
-	for _, fileName := range files {
-		processFile(fileName, *writeBack)
 	}
 }

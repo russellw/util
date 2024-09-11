@@ -8,6 +8,22 @@ import (
 	"path/filepath"
 )
 
+func main() {
+	if len(os.Args) < 3 {
+		log.Fatalf("Usage: %s dir program arg1 arg2... \n", os.Args[0])
+	}
+
+	// Directory
+	dir := os.Args[1]
+
+	// Program and its arguments
+	program := os.Args[2]
+	args := os.Args[3:]
+
+	// Traverse the directory tree and run the program on each file
+	walkDirAndRunProgram(dir, program, args)
+}
+
 // Function to execute a program on a file
 func runProgramOnFile(program string, args []string, filePath string) {
 	// Append the file path to the args
@@ -47,20 +63,4 @@ func walkDirAndRunProgram(root string, program string, args []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func main() {
-	if len(os.Args) < 3 {
-		log.Fatalf("Usage: %s dir program arg1 arg2... \n", os.Args[0])
-	}
-
-	// Directory
-	dir := os.Args[1]
-
-	// Program and its arguments
-	program := os.Args[2]
-	args := os.Args[3:]
-
-	// Traverse the directory tree and run the program on each file
-	walkDirAndRunProgram(dir, program, args)
 }

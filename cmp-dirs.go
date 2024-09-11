@@ -14,29 +14,6 @@ type FileInfo struct {
 	ModTime time.Time
 }
 
-// WalkDir recursively walks through a directory and stores the file info
-func WalkDir(dir string) (map[string]FileInfo, error) {
-	files := make(map[string]FileInfo)
-	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
-		if err != nil {
-			return err
-		}
-		if !info.IsDir() {
-			relPath, err := filepath.Rel(dir, path)
-			if err != nil {
-				return err
-			}
-			files[relPath] = FileInfo{
-				Path:    path,
-				Size:    info.Size(),
-				ModTime: info.ModTime(),
-			}
-		}
-		return nil
-	})
-	return files, err
-}
-
 // CompareDirectories compares two directories and prints differences
 func CompareDirectories(dir1, dir2 string) error {
 	files1, err := WalkDir(dir1)
@@ -69,6 +46,29 @@ func CompareDirectories(dir1, dir2 string) error {
 	}
 
 	return nil
+}
+
+// WalkDir recursively walks through a directory and stores the file info
+func WalkDir(dir string) (map[string]FileInfo, error) {
+	files := make(map[string]FileInfo)
+	err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+		if !info.IsDir() {
+			relPath, err := filepath.Rel(dir, path)
+			if err != nil {
+				return err
+			}
+			files[relPath] = FileInfo{
+				Path:    path,
+				Size:    info.Size(),
+				ModTime: info.ModTime(),
+			}
+		}
+		return nil
+	})
+	return files, err
 }
 
 func main() {

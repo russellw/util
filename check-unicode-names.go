@@ -7,16 +7,6 @@ import (
 	"unicode"
 )
 
-// isASCII checks if all characters in the string are ASCII.
-func isASCII(s string) bool {
-	for _, r := range s {
-		if r > unicode.MaxASCII {
-			return false
-		}
-	}
-	return true
-}
-
 // checkDir recursively checks directories for files or subdirectories with non-ASCII names.
 func checkDir(path string) error {
 	err := filepath.Walk(path, func(p string, info os.FileInfo, err error) error {
@@ -30,6 +20,16 @@ func checkDir(path string) error {
 		return nil
 	})
 	return err
+}
+
+// isASCII checks if all characters in the string are ASCII.
+func isASCII(s string) bool {
+	for _, r := range s {
+		if r > unicode.MaxASCII {
+			return false
+		}
+	}
+	return true
 }
 
 func main() {

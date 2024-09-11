@@ -11,9 +11,18 @@ import (
 	"unicode"
 )
 
-// Removes trailing whitespace from a string.
-func trimTrailingWhitespace(line string) string {
-	return strings.TrimRightFunc(line, unicode.IsSpace)
+func main() {
+	writeFlag := flag.Bool("w", false, "Rewrite files with trailing whitespace removed")
+	flag.Parse()
+
+	if len(flag.Args()) == 0 {
+		log.Fatal("Usage: remove-trail-space [-w] file1 [file2 ...]")
+	}
+
+	err := processFiles(flag.Args(), *writeFlag)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 // Processes a file to remove trailing whitespace.
@@ -70,16 +79,7 @@ func processFiles(files []string, writeChanges bool) error {
 	return nil
 }
 
-func main() {
-	writeFlag := flag.Bool("w", false, "Rewrite files with trailing whitespace removed")
-	flag.Parse()
-
-	if len(flag.Args()) == 0 {
-		log.Fatal("Usage: remove-trail-space [-w] file1 [file2 ...]")
-	}
-
-	err := processFiles(flag.Args(), *writeFlag)
-	if err != nil {
-		log.Fatal(err)
-	}
+// Removes trailing whitespace from a string.
+func trimTrailingWhitespace(line string) string {
+	return strings.TrimRightFunc(line, unicode.IsSpace)
 }

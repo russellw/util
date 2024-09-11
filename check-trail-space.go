@@ -39,6 +39,16 @@ func hasTrailingWhitespace(filename string) (bool, error) {
 	return false, nil
 }
 
+func main() {
+	root := "."
+
+	err := filepath.Walk(root, walkFunc)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+}
+
 // walkFunc is the function called for each file in the directory tree.
 func walkFunc(path string, info fs.FileInfo, err error) error {
 	if err != nil {
@@ -66,14 +76,4 @@ func walkFunc(path string, info fs.FileInfo, err error) error {
 	}
 
 	return nil
-}
-
-func main() {
-	root := "."
-
-	err := filepath.Walk(root, walkFunc)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
-		os.Exit(1)
-	}
 }

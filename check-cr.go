@@ -15,6 +15,13 @@ func containsCarriageReturn(content []byte) bool {
 	return bytes.Contains(content, []byte{carriageReturn})
 }
 
+func main() {
+	if err := walkDir(); err != nil {
+		fmt.Println("Error:", err)
+		os.Exit(1)
+	}
+}
+
 // processFile processes a single file, printing its full path if it contains the carriage return character.
 func processFile(path string, info os.FileInfo) error {
 	if info.IsDir() {
@@ -48,11 +55,4 @@ func walkDir() error {
 		}
 		return processFile(path, info)
 	})
-}
-
-func main() {
-	if err := walkDir(); err != nil {
-		fmt.Println("Error:", err)
-		os.Exit(1)
-	}
 }
