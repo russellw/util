@@ -1,1 +1,1 @@
-go test -v common_test.go common.go
+go test common_test.go common.go

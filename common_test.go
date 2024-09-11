@@ -206,3 +206,81 @@ func TestParseChunks_EmptyLines(t *testing.T) {
 		t.Errorf("Expected empty or nil slice, but got %v", result)
 	}
 }
+
+// Test case 1: Empty slice
+func TestGetRanges_EmptySlice(t *testing.T) {
+	f := func(x float64) bool { return x > 0 }
+	v := []float64{}
+
+	expected := []Range{}
+	result := getRanges(f, v)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("TestGetRanges_EmptySlice failed: expected %v, got %v", expected, result)
+	}
+}
+
+// Test case 2: All values matching predicate
+func TestGetRanges_AllValuesMatch(t *testing.T) {
+	f := func(x float64) bool { return x > 0 }
+	v := []float64{1.0, 2.5, 3.1}
+
+	expected := []Range{{i: 0, j: 3}}
+	result := getRanges(f, v)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("TestGetRanges_AllValuesMatch failed: expected %v, got %v", expected, result)
+	}
+}
+
+// Test case 3: No values matching predicate
+func TestGetRanges_NoValuesMatch(t *testing.T) {
+	f := func(x float64) bool { return x > 0 }
+	v := []float64{-1.0, -2.5, -3.1}
+
+	expected := []Range{}
+	result := getRanges(f, v)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("TestGetRanges_NoValuesMatch failed: expected %v, got %v", expected, result)
+	}
+}
+
+// Test case 4: Mixed values with one positive range
+func TestGetRanges_MixedValuesOneRange(t *testing.T) {
+	f := func(x float64) bool { return x > 0 }
+	v := []float64{-1.0, 2.5, 3.1, -3.1}
+
+	expected := []Range{{i: 1, j: 3}}
+	result := getRanges(f, v)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("TestGetRanges_MixedValuesOneRange failed: expected %v, got %v", expected, result)
+	}
+}
+
+// Test case 5: Mixed values with two positive ranges
+func TestGetRanges_MixedValuesTwoRanges(t *testing.T) {
+	f := func(x float64) bool { return x > 0 }
+	v := []float64{-1.0, 2.5, 3.1, -3.1, 1.2}
+
+	expected := []Range{{i: 1, j: 3}, {i: 4, j: 5}}
+	result := getRanges(f, v)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("TestGetRanges_MixedValuesTwoRanges failed: expected %v, got %v", expected, result)
+	}
+}
+
+// Test case 6: Single matching value
+func TestGetRanges_SingleMatchingValue(t *testing.T) {
+	f := func(x float64) bool { return x > 0 }
+	v := []float64{-1.0, 2.5, -3.1}
+
+	expected := []Range{{i: 1, j: 2}}
+	result := getRanges(f, v)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("TestGetRanges_SingleMatchingValue failed: expected %v, got %v", expected, result)
+	}
+}

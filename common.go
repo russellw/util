@@ -11,6 +11,10 @@ import (
 	"strings"
 )
 
+type Range struct {
+	i, j int
+}
+
 type Chunk struct {
 	name  string
 	lines []string
@@ -45,6 +49,31 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 	}
 	chunk := Chunk{name: name, lines: lines}
 	return append(chunks, chunk)
+}
+
+func getRanges(f func(float64) bool, v []float64) []Range {
+	n := len(v)
+	var ranges []Range
+	for i := 0; i < n; {
+		// negative range?
+		for i < n && !f(v[i]) {
+			i++
+		}
+
+		// positive range?
+		if i == n {
+			break
+		}
+		j := i + 1
+		for ; j < n; j++ {
+			if !f(v[j]) {
+				break
+			}
+		}
+		ranges = append(ranges, Range{i: i, j: j})
+		i = j
+	}
+	return ranges
 }
 
 func parseChunks(isComment func(string) bool, beginSpecial func(string) string, endSpecial func(string) EndSpecialKind, lines []string) []Chunk {
