@@ -63,7 +63,7 @@ func specialRanges(chunks []Chunk) []Range {
 func sortChunks(chunks []Chunk) {
 	for _, r := range specialRanges(chunks) {
 		sort.SliceStable(chunks[r.i:r.j], func(i, j int) bool {
-			return chunks[i].name < chunks[j].name
+			return chunks[r.i+i].name < chunks[r.i+j].name
 		})
 	}
 }
