@@ -207,6 +207,14 @@ func TestParseChunks_EmptyLines(t *testing.T) {
 	}
 }
 
+// Helper function to compare slices of Range, accounting for nil vs empty slice differences
+func areEqualRanges(a, b []Range) bool {
+	if len(a) == 0 && len(b) == 0 {
+		return true
+	}
+	return reflect.DeepEqual(a, b)
+}
+
 // Test case 1: Empty slice
 func TestGetRanges_EmptySlice(t *testing.T) {
 	f := func(x float64) bool { return x > 0 }
@@ -215,7 +223,7 @@ func TestGetRanges_EmptySlice(t *testing.T) {
 	expected := []Range{}
 	result := getRanges(f, v)
 
-	if !reflect.DeepEqual(result, expected) {
+	if !areEqualRanges(result, expected) {
 		t.Errorf("TestGetRanges_EmptySlice failed: expected %v, got %v", expected, result)
 	}
 }
@@ -228,7 +236,7 @@ func TestGetRanges_AllValuesMatch(t *testing.T) {
 	expected := []Range{{i: 0, j: 3}}
 	result := getRanges(f, v)
 
-	if !reflect.DeepEqual(result, expected) {
+	if !areEqualRanges(result, expected) {
 		t.Errorf("TestGetRanges_AllValuesMatch failed: expected %v, got %v", expected, result)
 	}
 }
@@ -241,7 +249,7 @@ func TestGetRanges_NoValuesMatch(t *testing.T) {
 	expected := []Range{}
 	result := getRanges(f, v)
 
-	if !reflect.DeepEqual(result, expected) {
+	if !areEqualRanges(result, expected) {
 		t.Errorf("TestGetRanges_NoValuesMatch failed: expected %v, got %v", expected, result)
 	}
 }
@@ -254,7 +262,7 @@ func TestGetRanges_MixedValuesOneRange(t *testing.T) {
 	expected := []Range{{i: 1, j: 3}}
 	result := getRanges(f, v)
 
-	if !reflect.DeepEqual(result, expected) {
+	if !areEqualRanges(result, expected) {
 		t.Errorf("TestGetRanges_MixedValuesOneRange failed: expected %v, got %v", expected, result)
 	}
 }
@@ -267,7 +275,7 @@ func TestGetRanges_MixedValuesTwoRanges(t *testing.T) {
 	expected := []Range{{i: 1, j: 3}, {i: 4, j: 5}}
 	result := getRanges(f, v)
 
-	if !reflect.DeepEqual(result, expected) {
+	if !areEqualRanges(result, expected) {
 		t.Errorf("TestGetRanges_MixedValuesTwoRanges failed: expected %v, got %v", expected, result)
 	}
 }
@@ -280,7 +288,7 @@ func TestGetRanges_SingleMatchingValue(t *testing.T) {
 	expected := []Range{{i: 1, j: 2}}
 	result := getRanges(f, v)
 
-	if !reflect.DeepEqual(result, expected) {
+	if !areEqualRanges(result, expected) {
 		t.Errorf("TestGetRanges_SingleMatchingValue failed: expected %v, got %v", expected, result)
 	}
 }
