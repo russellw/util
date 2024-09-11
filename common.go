@@ -108,7 +108,7 @@ func parseChunks(isComment func(string) bool, beginSpecial func(string) string, 
 	n := len(lines)
 	var chunks []Chunk
 	for i := 0; i < n; {
-		// non-special chunk?
+		// Non-special chunk?
 		j := i
 		for j < n && beginSpecial(lines[j]) == "" {
 			j++
@@ -120,7 +120,7 @@ func parseChunks(isComment func(string) bool, beginSpecial func(string) string, 
 		chunks = appendChunk(chunks, "", lines[i:j])
 		i = j
 
-		// special chunk?
+		// Special chunk?
 		if i == n {
 			break
 		}
@@ -132,6 +132,11 @@ func parseChunks(isComment func(string) bool, beginSpecial func(string) string, 
 				break loop
 			case endSpecialInclude:
 				j++
+
+				// If the end marker is included
+				// then it could be followed by blank lines which can also be included
+				for ; j < n && lines[j] == ""; j++ {
+				}
 				break loop
 			}
 		}
