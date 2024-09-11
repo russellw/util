@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"os"
@@ -224,6 +225,12 @@ func readLines(path string) []string {
 		log.Fatal(err)
 	}
 	return lines
+}
+
+func printLines(lines []string) {
+	for _, line := range lines {
+		fmt.Println(line)
+	}
 }
 
 func writeLines(path string, lines []string) {

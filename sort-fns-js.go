@@ -45,6 +45,17 @@ func processFile(path string) {
 		return
 	}
 	lines := readLines(path)
+	old := lines
 	chunks := parseChunks(isComment, beginFn, endFn, lines)
-	fmt.Println(path)
+	sortChunks(chunks)
+	lines = joinChunks(chunks)
+	if old == lines {
+		return
+	}
+	if writeBack {
+		fmt.Println(path)
+		writeLines(path, lines)
+	} else {
+		printLines(lines)
+	}
 }
