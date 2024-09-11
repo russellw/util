@@ -52,12 +52,12 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 	return append(chunks, chunk)
 }
 
-func isSpecial(chunk Chunk) bool {
+func special(chunk Chunk) bool {
 	return chunk.name != ""
 }
 
 func specialRanges(chunks []Chunk) []Range {
-	return getRanges(isSpecial, chunks)
+	return getRanges(special, chunks)
 }
 
 func sortChunks(chunks []Chunk) {
