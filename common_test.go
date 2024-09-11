@@ -331,3 +331,103 @@ func TestGetRanges_String(t *testing.T) {
 		t.Errorf("TestGetRanges_String failed: expected %v, got %v", expected, result)
 	}
 }
+
+// Test case 1: Empty chunks
+func TestSortChunks_Empty(t *testing.T) {
+	chunks := []Chunk{}
+
+	expected := []Chunk{}
+	sortChunks(chunks)
+
+	if !reflect.DeepEqual(chunks, expected) {
+		t.Errorf("TestSortChunks_Empty failed: expected %v, got %v", expected, chunks)
+	}
+}
+
+// Test case 2: No special chunks (chunks with empty names)
+func TestSortChunks_NoSpecial(t *testing.T) {
+	chunks := []Chunk{
+		{name: "", lines: []string{}},
+		{name: "", lines: []string{}},
+	}
+
+	expected := []Chunk{
+		{name: "", lines: []string{}},
+		{name: "", lines: []string{}},
+	}
+	sortChunks(chunks)
+
+	if !reflect.DeepEqual(chunks, expected) {
+		t.Errorf("TestSortChunks_NoSpecial failed: expected %v, got %v", expected, chunks)
+	}
+}
+
+// Test case 3: One special chunk range (with sorting needed)
+func TestSortChunks_OneSpecialRange(t *testing.T) {
+	chunks := []Chunk{
+		{name: "chunkC", lines: []string{}},
+		{name: "chunkA", lines: []string{}},
+		{name: "chunkB", lines: []string{}},
+	}
+
+	expected := []Chunk{
+		{name: "chunkA", lines: []string{}},
+		{name: "chunkB", lines: []string{}},
+		{name: "chunkC", lines: []string{}},
+	}
+	sortChunks(chunks)
+
+	if !reflect.DeepEqual(chunks, expected) {
+		t.Errorf("TestSortChunks_OneSpecialRange failed: expected %v, got %v", expected, chunks)
+	}
+}
+
+// Test case 4: Mixed special and non-special chunks
+func TestSortChunks_MixedSpecial(t *testing.T) {
+	chunks := []Chunk{
+		{name: "", lines: []string{}},       // Non-special
+		{name: "chunkC", lines: []string{}}, // Special
+		{name: "chunkA", lines: []string{}}, // Special
+		{name: "chunkB", lines: []string{}}, // Special
+		{name: "", lines: []string{}},       // Non-special
+	}
+
+	expected := []Chunk{
+		{name: "", lines: []string{}},       // Non-special
+		{name: "chunkA", lines: []string{}}, // Sorted special
+		{name: "chunkB", lines: []string{}}, // Sorted special
+		{name: "chunkC", lines: []string{}}, // Sorted special
+		{name: "", lines: []string{}},       // Non-special
+	}
+	sortChunks(chunks)
+
+	if !reflect.DeepEqual(chunks, expected) {
+		t.Errorf("TestSortChunks_MixedSpecial failed: expected %v, got %v", expected, chunks)
+	}
+}
+
+// Test case 5: Multiple special ranges
+func TestSortChunks_MultipleSpecialRanges(t *testing.T) {
+	chunks := []Chunk{
+		{name: "chunkC", lines: []string{}}, // Special
+		{name: "chunkA", lines: []string{}}, // Special
+		{name: "", lines: []string{}},       // Non-special
+		{name: "chunkD", lines: []string{}}, // Special
+		{name: "chunkB", lines: []string{}}, // Special
+		{name: "", lines: []string{}},       // Non-special
+	}
+
+	expected := []Chunk{
+		{name: "chunkA", lines: []string{}}, // Sorted special range 1
+		{name: "chunkC", lines: []string{}}, // Sorted special range 1
+		{name: "", lines: []string{}},       // Non-special
+		{name: "chunkB", lines: []string{}}, // Sorted special range 2
+		{name: "chunkD", lines: []string{}}, // Sorted special range 2
+		{name: "", lines: []string{}},       // Non-special
+	}
+	sortChunks(chunks)
+
+	if !reflect.DeepEqual(chunks, expected) {
+		t.Errorf("TestSortChunks_MultipleSpecialRanges failed: expected %v, got %v", expected, chunks)
+	}
+}
