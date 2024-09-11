@@ -71,6 +71,18 @@ func joinChunks(chunks []Chunk) []string {
 	return result
 }
 
+func specialSpace(chunks []Chunk) {
+	for i, chunk := range chunks {
+		if !special(chunk) {
+			continue
+		}
+		chunk.lines = trimBlankLines(chunk.lines)
+		if i < len(chunks)-1 {
+			chunk.lines = append(chunk.lines, "")
+		}
+	}
+}
+
 func sortChunks(chunks []Chunk) {
 	for _, r := range specialRanges(chunks) {
 		sort.SliceStable(chunks[r.i:r.j], func(i, j int) bool {
