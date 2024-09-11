@@ -54,41 +54,12 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 	return append(chunks, chunk)
 }
 
-func special(chunk Chunk) bool {
-	return chunk.name != ""
-}
-
-func specialRanges(chunks []Chunk) []Range {
-	return getRanges(special, chunks)
-}
-
-// Join the lines of each chunk together, into a single large array of text lines
-func joinChunks(chunks []Chunk) []string {
-	var result []string
-	for _, chunk := range chunks {
-		result = append(result, chunk.lines...)
+// Compare slices of string, accounting for nil vs empty slice differences
+func eqStrings(a, b []string) bool {
+	if len(a) == 0 && len(b) == 0 {
+		return true
 	}
-	return result
-}
-
-func specialSpace(chunks []Chunk) {
-	for i := range chunks {
-		if !special(chunks[i]) {
-			continue
-		}
-		chunks[i].lines = trimBlankLines(chunks[i].lines)
-		if i < len(chunks)-1 {
-			chunks[i].lines = append(chunks[i].lines, "")
-		}
-	}
-}
-
-func sortChunks(chunks []Chunk) {
-	for _, r := range specialRanges(chunks) {
-		sort.SliceStable(chunks[r.i:r.j], func(i, j int) bool {
-			return chunks[r.i+i].name < chunks[r.i+j].name
-		})
-	}
+	return reflect.DeepEqual(a, b)
 }
 
 func getRanges[T any](f func(T) bool, v []T) []Range {
@@ -114,64 +85,6 @@ func getRanges[T any](f func(T) bool, v []T) []Range {
 		i = j
 	}
 	return ranges
-}
-
-func parseChunks(isComment func(string) bool, beginSpecial func(string) string, endSpecial func(string) EndSpecialKind, lines []string) []Chunk {
-	n := len(lines)
-	var chunks []Chunk
-	for i := 0; i < n; {
-		// Non-special chunk?
-		j := i
-		for j < n && beginSpecial(lines[j]) == "" {
-			j++
-		}
-		k := j
-		for i < j && isComment(lines[j-1]) {
-			j--
-		}
-		chunks = appendChunk(chunks, "", lines[i:j])
-		i = j
-
-		// Special chunk?
-		if i == n {
-			break
-		}
-		name := beginSpecial(lines[k])
-	loop:
-		for j = k + 1; j < n; j++ {
-			switch endSpecial(lines[j]) {
-			case endSpecialExclude:
-				break loop
-			case endSpecialInclude:
-				j++
-
-				// If the end marker is included
-				// then it could be followed by blank lines which can also be included
-				for ; j < n && lines[j] == ""; j++ {
-				}
-				break loop
-			}
-		}
-		chunks = appendChunk(chunks, name, lines[i:j])
-		i = j
-	}
-	return chunks
-}
-
-func isComment(s string) bool {
-	return commentRe.MatchString(s)
-}
-
-func trimBlankLines(lines []string) []string {
-	// Iterate from the end of the slice and find the first non-blank line
-	for i := len(lines) - 1; i >= 0; i-- {
-		if strings.TrimSpace(lines[i]) != "" {
-			// Return the slice up to and including the last non-blank line
-			return lines[:i+1]
-		}
-	}
-	// If all lines are blank, return an empty slice
-	return []string{}
 }
 
 func ignore(dir string) bool {
@@ -227,6 +140,67 @@ func isCFamily(path string) bool {
 	return false
 }
 
+func isComment(s string) bool {
+	return commentRe.MatchString(s)
+}
+
+// Join the lines of each chunk together, into a single large array of text lines
+func joinChunks(chunks []Chunk) []string {
+	var result []string
+	for _, chunk := range chunks {
+		result = append(result, chunk.lines...)
+	}
+	return result
+}
+
+func parseChunks(isComment func(string) bool, beginSpecial func(string) string, endSpecial func(string) EndSpecialKind, lines []string) []Chunk {
+	n := len(lines)
+	var chunks []Chunk
+	for i := 0; i < n; {
+		// Non-special chunk?
+		j := i
+		for j < n && beginSpecial(lines[j]) == "" {
+			j++
+		}
+		k := j
+		for i < j && isComment(lines[j-1]) {
+			j--
+		}
+		chunks = appendChunk(chunks, "", lines[i:j])
+		i = j
+
+		// Special chunk?
+		if i == n {
+			break
+		}
+		name := beginSpecial(lines[k])
+	loop:
+		for j = k + 1; j < n; j++ {
+			switch endSpecial(lines[j]) {
+			case endSpecialExclude:
+				break loop
+			case endSpecialInclude:
+				j++
+
+				// If the end marker is included
+				// then it could be followed by blank lines which can also be included
+				for ; j < n && lines[j] == ""; j++ {
+				}
+				break loop
+			}
+		}
+		chunks = appendChunk(chunks, name, lines[i:j])
+		i = j
+	}
+	return chunks
+}
+
+func printLines(lines []string) {
+	for _, line := range lines {
+		fmt.Println(line)
+	}
+}
+
 func readLines(path string) []string {
 	file, err := os.Open(path)
 	if err != nil {
@@ -245,10 +219,44 @@ func readLines(path string) []string {
 	return lines
 }
 
-func printLines(lines []string) {
-	for _, line := range lines {
-		fmt.Println(line)
+func sortChunks(chunks []Chunk) {
+	for _, r := range specialRanges(chunks) {
+		sort.SliceStable(chunks[r.i:r.j], func(i, j int) bool {
+			return chunks[r.i+i].name < chunks[r.i+j].name
+		})
 	}
+}
+
+func special(chunk Chunk) bool {
+	return chunk.name != ""
+}
+
+func specialRanges(chunks []Chunk) []Range {
+	return getRanges(special, chunks)
+}
+
+func specialSpace(chunks []Chunk) {
+	for i := range chunks {
+		if !special(chunks[i]) {
+			continue
+		}
+		chunks[i].lines = trimBlankLines(chunks[i].lines)
+		if i < len(chunks)-1 {
+			chunks[i].lines = append(chunks[i].lines, "")
+		}
+	}
+}
+
+func trimBlankLines(lines []string) []string {
+	// Iterate from the end of the slice and find the first non-blank line
+	for i := len(lines) - 1; i >= 0; i-- {
+		if strings.TrimSpace(lines[i]) != "" {
+			// Return the slice up to and including the last non-blank line
+			return lines[:i+1]
+		}
+	}
+	// If all lines are blank, return an empty slice
+	return []string{}
 }
 
 func writeLines(path string, lines []string) {
@@ -280,12 +288,4 @@ func writeLines(path string, lines []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-// Compare slices of string, accounting for nil vs empty slice differences
-func eqStrings(a, b []string) bool {
-	if len(a) == 0 && len(b) == 0 {
-		return true
-	}
-	return reflect.DeepEqual(a, b)
 }
