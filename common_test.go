@@ -292,3 +292,42 @@ func TestGetRanges_SingleMatchingValue(t *testing.T) {
 		t.Errorf("TestGetRanges_SingleMatchingValue failed: expected %v, got %v", expected, result)
 	}
 }
+
+// Test case with float64 values
+func TestGetRanges_Float64(t *testing.T) {
+	f := func(x float64) bool { return x > 0 }
+	v := []float64{-1.0, 2.5, 3.1, -3.1, 1.2}
+
+	expected := []Range{{i: 1, j: 3}, {i: 4, j: 5}}
+	result := getRanges(f, v)
+
+	if !areEqualRanges(result, expected) {
+		t.Errorf("TestGetRanges_Float64 failed: expected %v, got %v", expected, result)
+	}
+}
+
+// Test case with integers
+func TestGetRanges_Int(t *testing.T) {
+	f := func(x int) bool { return x%2 == 0 } // Test for even numbers
+	v := []int{1, 2, 4, 1, 6, 8, 3}
+
+	expected := []Range{{i: 1, j: 3}, {i: 4, j: 6}}
+	result := getRanges(f, v)
+
+	if !areEqualRanges(result, expected) {
+		t.Errorf("TestGetRanges_Int failed: expected %v, got %v", expected, result)
+	}
+}
+
+// Test case with strings
+func TestGetRanges_String(t *testing.T) {
+	f := func(s string) bool { return len(s) > 3 } // Test for strings longer than 3 characters
+	v := []string{"go", "hello", "world", "hi", "golang"}
+
+	expected := []Range{{i: 1, j: 3}, {i: 4, j: 5}}
+	result := getRanges(f, v)
+
+	if !areEqualRanges(result, expected) {
+		t.Errorf("TestGetRanges_String failed: expected %v, got %v", expected, result)
+	}
+}
