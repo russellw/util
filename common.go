@@ -72,13 +72,13 @@ func joinChunks(chunks []Chunk) []string {
 }
 
 func specialSpace(chunks []Chunk) {
-	for i, chunk := range chunks {
-		if !special(chunk) {
+	for i := range chunks {
+		if !special(chunks[i]) {
 			continue
 		}
-		chunk.lines = trimBlankLines(chunk.lines)
+		chunks[i].lines = trimBlankLines(chunks[i].lines)
 		if i < len(chunks)-1 {
-			chunk.lines = append(chunk.lines, "")
+			chunks[i].lines = append(chunks[i].lines, "")
 		}
 	}
 }
