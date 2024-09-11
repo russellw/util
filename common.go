@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"reflect"
 	"regexp"
 	"sort"
 	"strings"
@@ -262,4 +263,12 @@ func writeLines(path string, lines []string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+// Compare slices of string, accounting for nil vs empty slice differences
+func eqStrings(a, b []string) bool {
+	if len(a) == 0 && len(b) == 0 {
+		return true
+	}
+	return reflect.DeepEqual(a, b)
 }

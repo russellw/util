@@ -49,7 +49,7 @@ func processFile(path string) {
 	chunks := parseChunks(isComment, beginFn, endFn, lines)
 	sortChunks(chunks)
 	lines = joinChunks(chunks)
-	if old == lines {
+	if eqStrings(old, lines) {
 		return
 	}
 	if writeBack {
