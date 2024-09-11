@@ -60,6 +60,15 @@ func specialRanges(chunks []Chunk) []Range {
 	return getRanges(special, chunks)
 }
 
+// Join the lines of each chunk together, into a single large array of text lines
+func joinChunks(chunks []Chunk) []string {
+	var result []string
+	for _, chunk := range chunks {
+		result = append(result, chunk.lines...)
+	}
+	return result
+}
+
 func sortChunks(chunks []Chunk) {
 	for _, r := range specialRanges(chunks) {
 		sort.SliceStable(chunks[r.i:r.j], func(i, j int) bool {

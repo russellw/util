@@ -431,3 +431,56 @@ func TestSortChunks_MultipleSpecialRanges(t *testing.T) {
 		t.Errorf("TestSortChunks_MultipleSpecialRanges failed: expected %v, got %v", expected, chunks)
 	}
 }
+
+func TestJoinChunks(t *testing.T) {
+	tests := []struct {
+		name     string
+		chunks   []Chunk
+		expected []string
+	}{
+		{
+			name: "Single chunk with multiple lines",
+			chunks: []Chunk{
+				{name: "Chunk1", lines: []string{"line1", "line2", "line3"}},
+			},
+			expected: []string{"line1", "line2", "line3"},
+		},
+		{
+			name: "Multiple chunks with lines",
+			chunks: []Chunk{
+				{name: "Chunk1", lines: []string{"line1", "line2"}},
+				{name: "Chunk2", lines: []string{"line3", "line4"}},
+			},
+			expected: []string{"line1", "line2", "line3", "line4"},
+		},
+		{
+			name: "Empty chunk list",
+			chunks: []Chunk{
+				{name: "Chunk1", lines: nil},
+			},
+			expected: nil, // Expect nil here
+		},
+		{
+			name: "Chunks with no lines",
+			chunks: []Chunk{
+				{name: "Chunk1", lines: []string{}},
+				{name: "Chunk2", lines: []string{}},
+			},
+			expected: nil,
+		},
+		{
+			name:     "No chunks",
+			chunks:   []Chunk{},
+			expected: nil,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := joinChunks(tt.chunks)
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
+			}
+		})
+	}
+}
