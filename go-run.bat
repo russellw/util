@@ -1,1 +1,1 @@
-go run %1 common.go %2 %3
+go run %1 common.go -- %2 %3
