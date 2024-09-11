@@ -51,6 +51,14 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 	return append(chunks, chunk)
 }
 
+func isSpecial(chunk Chunk) bool {
+	return chunk.name == ""
+}
+
+func specialRanges(chunks []Chunk) []Range {
+	return getRanges(isSpecial, chunks)
+}
+
 func getRanges[T any](f func(T) bool, v []T) []Range {
 	n := len(v)
 	var ranges []Range
