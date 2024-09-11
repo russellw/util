@@ -8,6 +8,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"sort"
 	"strings"
 )
 
@@ -52,11 +53,19 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 }
 
 func isSpecial(chunk Chunk) bool {
-	return chunk.name == ""
+	return chunk.name != ""
 }
 
 func specialRanges(chunks []Chunk) []Range {
 	return getRanges(isSpecial, chunks)
+}
+
+func sortChunks(chunks []Chunk) {
+	for _, r := range specialRanges(chunks) {
+		sort.SliceStable(chunks[r.i:r.j], func(i, j int) bool {
+			return chunks[i].name < chunks[j].name
+		})
+	}
 }
 
 func getRanges[T any](f func(T) bool, v []T) []Range {
