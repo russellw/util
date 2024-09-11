@@ -51,7 +51,7 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 	return append(chunks, chunk)
 }
 
-func getRanges(f func(float64) bool, v []float64) []Range {
+func getRanges[T any](f func(T) bool, v []T) []Range {
 	n := len(v)
 	var ranges []Range
 	for i := 0; i < n; {
