@@ -1,5 +1,5 @@
 rem C and C++
-clang-format -i --style=file *.c *.cpp||exit /b
+rem clang-format -i --style=file *.c *.cpp||exit /b
 
 rem Go
 gofmt -s -w .||exit /b
