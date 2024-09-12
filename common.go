@@ -313,6 +313,14 @@ func trimBlankLines(lines []string) []string {
 	return []string{}
 }
 
+// trimPrefixOrEmpty trims the given prefix from the string. If the prefix is not present, it returns an empty string.
+func trimPrefixOrEmpty(s, prefix string) string {
+	if strings.HasPrefix(s, prefix) {
+		return s[len(prefix):] // Directly take the substring after the prefix
+	}
+	return ""
+}
+
 func writeLines(path string, lines []string) {
 	// Create or open the file for writing
 	file, err := os.Create(path)

@@ -6,7 +6,6 @@ import (
 	"log"
 	"path/filepath"
 	"regexp"
-	"strings"
 )
 
 var fnRe = regexp.MustCompile(`^function\s+(\w+)`)
@@ -34,7 +33,7 @@ func processFile(path string) {
 		// The input string may or may not contain a JavaScript function declaration
 		// Returns the function name if so, otherwise the empty string
 		beginFn := func(s string) string {
-			s = strings.TrimPrefix(s, dent)
+			s = trimPrefixOrEmpty(s, dent)
 			match := fnRe.FindStringSubmatch(s)
 			if len(match) > 1 {
 				return match[1] // Return the function name (first captured group)
@@ -43,7 +42,7 @@ func processFile(path string) {
 		}
 
 		endFn := func(s string) EndSpecialKind {
-			s = strings.TrimPrefix(s, dent)
+			s = trimPrefixOrEmpty(s, dent)
 			if s == "}" {
 				return endSpecialInclude
 			}
