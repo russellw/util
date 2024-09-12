@@ -110,6 +110,17 @@ func ignore(dir string) bool {
 	return exists
 }
 
+// Return the longest prefix of the string, that consists of indentation characters
+func indentation(s string) string {
+	var i int
+	for i = 0; i < len(s); i++ {
+		if s[i] != ' ' && s[i] != '\t' {
+			break
+		}
+	}
+	return s[:i]
+}
+
 // isBinary detects if a file is binary by first checking its extension
 // against a known list of binary types, and then checking the entire file for null bytes.
 func isBinary(file string) bool {
