@@ -54,6 +54,12 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 	return append(chunks, chunk)
 }
 
+func copySlice(v []string) []string {
+	r := make([]string, len(v))
+	copy(r, v)
+	return r
+}
+
 // Compare slices of string, accounting for nil vs empty slice differences
 func eqStrings(a, b []string) bool {
 	if len(a) == 0 && len(b) == 0 {

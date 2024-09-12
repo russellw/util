@@ -6,6 +6,61 @@ import (
 	"testing"
 )
 
+func TestCopyEmptySlice(t *testing.T) {
+	// Test Case 2: Copy an empty slice
+	input := []string{}
+	expected := []string{}
+
+	result := copySlice(input)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}
+
+func TestCopyNilSlice(t *testing.T) {
+	// Test Case 4: Copy a nil slice
+	var input []string
+	var expected []string
+
+	result := copySlice(input)
+
+	if !eqStrings(result, expected) {
+		t.Errorf("Expected nil slice, but got %v", result)
+	}
+}
+
+func TestCopySingleElementSlice(t *testing.T) {
+	// Test Case 3: Copy a slice with one element
+	input := []string{"single"}
+	expected := []string{"single"}
+
+	result := copySlice(input)
+
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+}
+
+func TestCopySlice(t *testing.T) {
+	// Test Case 1: Copy a slice of strings
+	input := []string{"apple", "banana", "cherry"}
+	expected := []string{"apple", "banana", "cherry"}
+
+	result := copySlice(input)
+
+	// Verify if the result matches the expected output
+	if !reflect.DeepEqual(result, expected) {
+		t.Errorf("Expected %v, but got %v", expected, result)
+	}
+
+	// Ensure the original slice is not affected by changes to the copy
+	result[0] = "modified"
+	if reflect.DeepEqual(result, input) {
+		t.Errorf("Original slice was modified. Expected original: %v, got: %v", input, result)
+	}
+}
+
 func TestFindString_Ef(t *testing.T) {
 	re := regexp.MustCompile(`ef`)
 	v := []string{"abc", "test1", "def", "test2"}
