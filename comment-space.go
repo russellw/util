@@ -43,7 +43,7 @@ func processFile(filename string, write bool) {
 
 	for i, line := range lines {
 		trimmed := strings.TrimSpace(line)
-		if strings.HasPrefix(trimmed, "//") && !strings.HasPrefix(trimmed, "// ") {
+		if len(trimmed) > 2 && strings.HasPrefix(trimmed, "//") && !strings.HasPrefix(trimmed, "// ") {
 			fmt.Printf("%s:%d: %s\n", filename, i+1, line)
 			changed = true
 			line = strings.Replace(line, "//", "// ", 1)
