@@ -19,16 +19,23 @@ func main() {
 		log.Fatal("No files were specified")
 	}
 	for _, path := range files {
-		processFile(path)
+		if filepath.Ext(path) == ".js" {
+			processFile(path)
+		}
 	}
 }
 
 func processFile(path string) {
-	if filepath.Ext(path) != ".js" {
-		return
-	}
+	// Read the file
 	lines := readLines(path)
+
+	// Remember the original contents
+	// It is safe to do this by reference here
+	// because the new version will be constructed as a new array
+	// not by modifying the old array
 	old := lines
+
+	// Process the contents
 	for _, dent := range indentations(lines) {
 		// The input string may or may not contain a JavaScript function declaration
 		// Returns the function name if so, otherwise the empty string
@@ -54,9 +61,13 @@ func processFile(path string) {
 		specialSpace(chunks)
 		lines = joinChunks(chunks)
 	}
+
+	// Did anything change?
 	if eqStrings(old, lines) {
 		return
 	}
+
+	// Write results
 	if writeBack {
 		fmt.Println(path)
 		writeLines(path, lines)
