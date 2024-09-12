@@ -30,7 +30,7 @@ func processFile(path string) {
 	lines := readLines(path)
 
 	// Remember the original contents
-	old := lines
+	old := copySlice(lines)
 
 	// Process the contents
 	for i := 0; ; {
