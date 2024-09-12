@@ -50,7 +50,7 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 	if len(lines) == 0 {
 		return chunks
 	}
-	chunk := Chunk{name: name, lines: lines}
+	chunk := Chunk{name: name, lines: copySlice(lines)}
 	return append(chunks, chunk)
 }
 
