@@ -62,6 +62,18 @@ func eqStrings(a, b []string) bool {
 	return reflect.DeepEqual(a, b)
 }
 
+// Find the first string that matches the regular expression, starting the search at the given index
+// and return the found index
+// or -1 if there was no occurrence
+func findString(re *regexp.Regexp, v []string, i int) int {
+	for ; i < len(v); i++ {
+		if re.MatchString(v[i]) {
+			return i
+		}
+	}
+	return -1
+}
+
 func getRanges[T any](f func(T) bool, v []T) []Range {
 	n := len(v)
 	var ranges []Range

@@ -2,8 +2,54 @@ package main
 
 import (
 	"reflect"
+	"regexp"
 	"testing"
 )
+
+func TestFindString_EmptySlice(t *testing.T) {
+	re := regexp.MustCompile(`^test`)
+	v := []string{}
+	index := findString(re, v, 0)
+	if index != -1 {
+		t.Errorf("Expected index -1, got %d", index)
+	}
+}
+
+func TestFindString_Found(t *testing.T) {
+	re := regexp.MustCompile(`^test`)
+	v := []string{"abc", "test1", "def", "test2"}
+	index := findString(re, v, 0)
+	if index != 1 {
+		t.Errorf("Expected index 1, got %d", index)
+	}
+}
+
+func TestFindString_InvalidStartIndex(t *testing.T) {
+	re := regexp.MustCompile(`^test`)
+	v := []string{"abc", "test1", "def", "test2"}
+	index := findString(re, v, len(v)+1) // Start index out of range
+	if index != -1 {
+		t.Errorf("Expected index -1, got %d", index)
+	}
+}
+
+func TestFindString_NotFound(t *testing.T) {
+	re := regexp.MustCompile(`^test`)
+	v := []string{"abc", "def", "ghi"}
+	index := findString(re, v, 0)
+	if index != -1 {
+		t.Errorf("Expected index -1, got %d", index)
+	}
+}
+
+func TestFindString_StartIndex(t *testing.T) {
+	re := regexp.MustCompile(`^test`)
+	v := []string{"abc", "test1", "def", "test2"}
+	index := findString(re, v, 2) // Start searching from index 2
+	if index != 3 {
+		t.Errorf("Expected index 3, got %d", index)
+	}
+}
 
 // Test case 2: All values matching predicate
 func TestGetRanges_AllValuesMatch(t *testing.T) {
