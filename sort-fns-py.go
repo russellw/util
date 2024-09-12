@@ -8,8 +8,8 @@ import (
 	"regexp"
 )
 
-var writeBack bool
 var fnRe = regexp.MustCompile(`^def\s+(\w+)`)
+var writeBack bool
 
 func beginFn(s string) string {
 	match := fnRe.FindStringSubmatch(s)
@@ -20,6 +20,7 @@ func beginFn(s string) string {
 }
 
 func endFn(s string) EndSpecialKind {
+	// TODO
 	if s == "}" {
 		return endSpecialInclude
 	}
