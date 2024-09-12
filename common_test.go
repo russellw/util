@@ -6,6 +6,52 @@ import (
 	"testing"
 )
 
+// Unit test for appendUnique function
+func TestAppendUnique(t *testing.T) {
+	tests := []struct {
+		name     string
+		v        []string
+		s        string
+		expected []string
+	}{
+		{"Add unique string", []string{"apple", "banana"}, "cherry", []string{"apple", "banana", "cherry"}},
+		{"Duplicate string", []string{"apple", "banana"}, "apple", []string{"apple", "banana"}},
+		{"Empty slice", []string{}, "apple", []string{"apple"}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := appendUnique(tt.v, tt.s)
+			if !reflect.DeepEqual(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
+			}
+		})
+	}
+}
+
+// Unit test for contains function
+func TestContains(t *testing.T) {
+	tests := []struct {
+		name     string
+		slice    []string
+		str      string
+		expected bool
+	}{
+		{"Contains string", []string{"apple", "banana", "cherry"}, "banana", true},
+		{"Does not contain string", []string{"apple", "banana", "cherry"}, "grape", false},
+		{"Empty slice", []string{}, "apple", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := contains(tt.slice, tt.str)
+			if result != tt.expected {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
+			}
+		})
+	}
+}
+
 func TestCopyEmptySlice(t *testing.T) {
 	// Test Case 2: Copy an empty slice
 	input := []string{}
@@ -229,6 +275,54 @@ func TestGetRanges_String(t *testing.T) {
 
 	if !areEqualRanges(result, expected) {
 		t.Errorf("TestGetRanges_String failed: expected %v, got %v", expected, result)
+	}
+}
+
+// Unit test for indentation function
+func TestIndentation(t *testing.T) {
+	tests := []struct {
+		name     string
+		s        string
+		expected string
+	}{
+		{"Spaces", "    abc", "    "},
+		{"Tabs", "\t\tabc", "\t\t"},
+		{"Mixed spaces and tabs", " \t abc", " \t "},
+		{"No indentation", "abc", ""},
+		{"Only spaces", "    ", "    "},
+		{"Only tabs", "\t\t", "\t\t"},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := indentation(tt.s)
+			if result != tt.expected {
+				t.Errorf("Expected %q, got %q", tt.expected, result)
+			}
+		})
+	}
+}
+
+// Unit test for indentations function
+func TestIndentations(t *testing.T) {
+	tests := []struct {
+		name     string
+		v        []string
+		expected []string
+	}{
+		{"Multiple lines with different indentations", []string{"    line1", "\tline2", " line3"}, []string{"    ", "\t", " "}},
+		{"Duplicate indentations", []string{"    line1", "    line2", "\tline3"}, []string{"    ", "\t"}},
+		{"No indentation", []string{"line1", "line2"}, []string{""}},
+		{"Empty slice", []string{}, []string{}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			result := indentations(tt.v)
+			if !eqStrings(result, tt.expected) {
+				t.Errorf("Expected %v, got %v", tt.expected, result)
+			}
+		})
 	}
 }
 

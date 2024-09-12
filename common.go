@@ -54,6 +54,22 @@ func appendChunk(chunks []Chunk, name string, lines []string) []Chunk {
 	return append(chunks, chunk)
 }
 
+func appendUnique(v []string, s string) []string {
+	if contains(v, s) {
+		return v
+	}
+	return append(v, s)
+}
+
+func contains(slice []string, str string) bool {
+	for _, v := range slice {
+		if v == str {
+			return true
+		}
+	}
+	return false
+}
+
 func copySlice(v []string) []string {
 	r := make([]string, len(v))
 	copy(r, v)
@@ -119,6 +135,15 @@ func indentation(s string) string {
 		}
 	}
 	return s[:i]
+}
+
+// Return the set of indentations of all strings in the slice, represented as an array
+func indentations(v []string) []string {
+	var r []string
+	for _, s := range v {
+		r = appendUnique(r, indentation(s))
+	}
+	return r
 }
 
 // isBinary detects if a file is binary by first checking its extension
