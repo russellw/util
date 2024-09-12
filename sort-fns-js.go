@@ -9,7 +9,7 @@ import (
 )
 
 var writeBack bool
-var fnRe = regexp.MustCompile(`function\s+(\w+)`)
+var fnRe = regexp.MustCompile(`^function\s+(\w+)`)
 
 // The input string may or may not contain a JavaScript function declaration
 // Returns the function name if so, otherwise the empty string

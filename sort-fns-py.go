@@ -9,7 +9,7 @@ import (
 )
 
 var writeBack bool
-var fnRe = regexp.MustCompile(`def\s+(\w+)`)
+var fnRe = regexp.MustCompile(`^def\s+(\w+)`)
 
 func beginFn(s string) string {
 	match := fnRe.FindStringSubmatch(s)

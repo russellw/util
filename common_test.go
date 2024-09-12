@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func TestFindString_Ef(t *testing.T) {
+	re := regexp.MustCompile(`ef`)
+	v := []string{"abc", "test1", "def", "test2"}
+	index := findString(re, v, 0)
+	if index != 2 {
+		t.Errorf("Expected index 2, got %d", index)
+	}
+}
+
 func TestFindString_EmptySlice(t *testing.T) {
 	re := regexp.MustCompile(`^test`)
 	v := []string{}
