@@ -96,6 +96,15 @@ func findString(re *regexp.Regexp, v []string, i int) int {
 	return -1
 }
 
+func findStringNot(re *regexp.Regexp, v []string, i int) int {
+	for ; i < len(v); i++ {
+		if !re.MatchString(v[i]) {
+			return i
+		}
+	}
+	return -1
+}
+
 func getRanges[T any](f func(T) bool, v []T) []Range {
 	n := len(v)
 	var ranges []Range
