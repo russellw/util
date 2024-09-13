@@ -4,10 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"regexp"
+	"strings"
 )
 
-var caseRe = regexp.MustCompile(`^case `)
 var writeBack bool
 
 func main() {
@@ -38,15 +37,19 @@ func processFile(path string) {
 	for _, dent := range indentations(lines) {
 		begin := func(s string) string {
 			s = trimPrefixOrEmpty(s, dent)
-			if caseRe.MatchString(s) {
+			if strings.HasPrefix(s, "case ") || strings.HasPrefix(s, "default:") {
 				return s
 			}
 			return ""
 		}
 
 		end := func(s string) EndSpecialKind {
-			if indentation(s) == dent {
+			d := indentation(s)
+			if d == dent {
 				return endSpecialExclude
+			}
+			if len(d) < len(dent) {
+				log.Fatalf("%s: '%s'", path, s)
 			}
 			return endSpecialNo
 		}
