@@ -247,7 +247,7 @@ func parseCases(lines []string) []Chunk {
 		dent := indentationLen(name)
 
 		// Multiple case labels
-		for j = i; j < n && caseRe.MatchString(lines[j]); j++ {
+		for j = i + 1; j < n && caseRe.MatchString(lines[j]); j++ {
 		}
 
 		// Case block ends at dedent
