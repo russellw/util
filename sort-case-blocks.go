@@ -4,7 +4,6 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"strings"
 )
 
 var writeBack bool
@@ -35,28 +34,8 @@ func processFile(path string) {
 
 	// Process the contents
 	for _, dent := range indentations(lines) {
-		begin := func(s string) string {
-			s = trimPrefixOrEmpty(s, dent)
-			if strings.HasPrefix(s, "case ") || strings.HasPrefix(s, "default:") {
-				return s
-			}
-			return ""
-		}
-
-		end := func(s string) EndSpecialKind {
-			d := indentation(s)
-			if d == dent {
-				return endSpecialExclude
-			}
-			if len(d) < len(dent) {
-				log.Fatalf("%s: '%s'", path, s)
-			}
-			return endSpecialNo
-		}
-
-		chunks := parseChunks(isComment, begin, end, lines)
+		chunks := parseCases(dent, lines)
 		sortChunks(chunks)
-		specialSpace(chunks)
 		lines = joinChunks(chunks)
 	}
 

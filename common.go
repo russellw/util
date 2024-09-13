@@ -31,7 +31,6 @@ const (
 	endSpecialInclude
 )
 
-var caseRe = regexp.MustCompile(`^\s*(case |default:)`)
 var commentRe = regexp.MustCompile(`\s*//`)
 
 // Known binary file extensions
@@ -214,6 +213,14 @@ func isCFamily(path string) bool {
 	return false
 }
 
+func isCase(dent string, s string) bool {
+	s = trimPrefixOrEmpty(s, dent)
+	if s == "" {
+		return false
+	}
+	return strings.HasPrefix(s, "case ") || strings.HasPrefix(s, "default:")
+}
+
 func isComment(s string) bool {
 	return commentRe.MatchString(s)
 }
@@ -227,13 +234,13 @@ func joinChunks(chunks []Chunk) []string {
 	return result
 }
 
-func parseCases(lines []string) []Chunk {
+func parseCases(dent string, lines []string) []Chunk {
 	n := len(lines)
 	var chunks []Chunk
 	for i := 0; i < n; {
 		// Non-case chunk?
 		j := i
-		for j < n && !caseRe.MatchString(lines[j]) {
+		for j < n && !isCase(dent, lines[j]) {
 			j++
 		}
 		chunks = appendChunk(chunks, "", lines[i:j])
@@ -244,15 +251,15 @@ func parseCases(lines []string) []Chunk {
 			break
 		}
 		name := lines[i]
-		dent := indentationLen(name)
 
 		// Multiple case labels
-		for j = i + 1; j < n && caseRe.MatchString(lines[j]); j++ {
+		for j = i + 1; j < n && isCase(dent, lines[j]); j++ {
 		}
 
 		// Case block ends at dedent
+		d := len(dent)
 		for ; j < n; j++ {
-			if indentationLen(lines[j]) <= dent {
+			if indentationLen(lines[j]) <= d {
 				break
 			}
 		}

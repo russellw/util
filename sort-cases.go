@@ -4,9 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"regexp"
 	"sort"
 )
 
+var caseRe = regexp.MustCompile(`^\s+(case |default:)`)
 var writeBack bool
 
 func main() {

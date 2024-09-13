@@ -486,7 +486,7 @@ func TestParseCases(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := parseCases(tt.lines)
+			got := parseCases("", tt.lines)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("parseCases() = %v, want %v", got, tt.want)
 			}
