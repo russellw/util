@@ -31,7 +31,7 @@ const (
 	endSpecialInclude
 )
 
-var caseRe = regexp.MustCompile(`^\s+(case |default:)`)
+var caseRe = regexp.MustCompile(`^\s*(case |default:)`)
 var commentRe = regexp.MustCompile(`\s*//`)
 
 // Known binary file extensions
