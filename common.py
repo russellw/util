@@ -2,10 +2,16 @@ import csv
 from io import StringIO
 
 def dicts_to_csv(dict_list):
+    if not dict_list:
+        return ""  # Return empty string if the input list is empty
+
     # Get the union of all keys (column headings)
     all_keys = set()
     for d in dict_list:
         all_keys.update(d.keys())
+    if not all_keys:
+        return "\r\n"  # If there are no keys in the dictionaries, return a single line break
+
     all_keys = sorted(all_keys)  # Sort keys for consistent ordering
 
     # Create a StringIO object to hold the CSV data
