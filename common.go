@@ -31,6 +31,7 @@ const (
 	endSpecialInclude
 )
 
+var caseRe = regexp.MustCompile(`^\s+(case |default:)`)
 var commentRe = regexp.MustCompile(`\s*//`)
 
 // Known binary file extensions
@@ -146,6 +147,16 @@ func indentation(s string) string {
 	return s[:i]
 }
 
+func indentationLen(s string) int {
+	var i int
+	for i = 0; i < len(s); i++ {
+		if s[i] != ' ' && s[i] != '\t' {
+			break
+		}
+	}
+	return i
+}
+
 // Return the set of indentations of all strings in the slice, represented as an array
 func indentations(v []string) []string {
 	var r []string
@@ -214,6 +225,44 @@ func joinChunks(chunks []Chunk) []string {
 		result = append(result, chunk.lines...)
 	}
 	return result
+}
+
+func parseCases(lines []string) []Chunk {
+	n := len(lines)
+	var chunks []Chunk
+	for i := 0; i < n; {
+		// Non-case chunk?
+		j := i
+		for j < n && !caseRe.MatchString(lines[j]) {
+			j++
+		}
+		chunks = appendChunk(chunks, "", lines[i:j])
+		i = j
+
+		// Case chunk?
+		if i == n {
+			break
+		}
+		name := lines[i]
+		dent := indentationLen(name)
+
+		// Multiple case labels
+		for j = i; j < n && caseRe.MatchString(lines[j]); j++ {
+		}
+
+		// Case block ends at dedent
+		for ; j < n; j++ {
+			if indentationLen(lines[j]) <= dent {
+				break
+			}
+		}
+		if j == n {
+			log.Fatalf("%d: unclosed case", i+1)
+		}
+		chunks = appendChunk(chunks, name, lines[i:j])
+		i = j
+	}
+	return chunks
 }
 
 func parseChunks(isComment func(string) bool, beginSpecial func(string) string, endSpecial func(string) EndSpecialKind, lines []string) []Chunk {

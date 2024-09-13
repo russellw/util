@@ -405,6 +405,95 @@ func TestJoinChunks(t *testing.T) {
 	}
 }
 
+// Test function for parseCases
+func TestParseCases(t *testing.T) {
+	tests := []struct {
+		name  string
+		lines []string
+		want  []Chunk
+	}{
+		{
+			name: "Single case block",
+			lines: []string{
+				"switch x {",
+				"case 1:",
+				"    // Do something",
+				"}",
+			},
+			want: []Chunk{
+				createChunk("", "switch x {"),
+				createChunk("case 1:", "case 1:", "    // Do something"),
+				createChunk("", "}"),
+			},
+		},
+		{
+			name: "Multiple case blocks",
+			lines: []string{
+				"switch x {",
+				"case 1:",
+				"    // Do something",
+				"case 2:",
+				"    // Do something else",
+				"}",
+			},
+			want: []Chunk{
+				createChunk("", "switch x {"),
+				createChunk("case 1:", "case 1:", "    // Do something"),
+				createChunk("case 2:", "case 2:", "    // Do something else"),
+				createChunk("", "}"),
+			},
+		},
+		{
+			name: "Default case",
+			lines: []string{
+				"switch x {",
+				"default:",
+				"    // Default case",
+				"}",
+			},
+			want: []Chunk{
+				createChunk("", "switch x {"),
+				createChunk("default:", "default:", "    // Default case"),
+				createChunk("", "}"),
+			},
+		},
+		{
+			name: "Multiple case labels in one block",
+			lines: []string{
+				"switch x {",
+				"case 1:",
+				"case 2:",
+				"    // Do something for both cases",
+				"}",
+			},
+			want: []Chunk{
+				createChunk("", "switch x {"),
+				createChunk("case 1:", "case 1:", "case 2:", "    // Do something for both cases"),
+				createChunk("", "}"),
+			},
+		},
+		{
+			name: "No case blocks",
+			lines: []string{
+				"var x = 10;",
+				"var y = 20;",
+			},
+			want: []Chunk{
+				createChunk("", "var x = 10;", "var y = 20;"),
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := parseCases(tt.lines)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("parseCases() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestParseChunks_EmptyLines(t *testing.T) {
 	isComment := func(s string) bool { return false }
 	beginSpecial := func(s string) string { return "" }
@@ -687,4 +776,12 @@ func areEqualRanges(a, b []Range) bool {
 		return true
 	}
 	return reflect.DeepEqual(a, b)
+}
+
+// Helper function to create a chunk
+func createChunk(name string, lines ...string) Chunk {
+	return Chunk{
+		name:  name,
+		lines: lines,
+	}
 }
