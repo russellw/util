@@ -12,7 +12,7 @@ import (
 )
 
 func exempt(text string) bool {
-	return unicode.IsUpper(rune(text[1]))
+	return len(text) > 1 && unicode.IsUpper(rune(text[1]))
 }
 
 func lowercaseFirstWord(comment string) string {
