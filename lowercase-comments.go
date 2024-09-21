@@ -11,8 +11,12 @@ import (
 	"unicode"
 )
 
+func exempt(text string) bool {
+	return strings.HasPrefix(text, "http://") || strings.HasPrefix(text, "https://") || strings.HasPrefix(text, "SORT")
+}
+
 func lowercaseFirstWord(comment string) string {
-	if isURL(comment) {
+	if exempt(comment) {
 		return comment
 	}
 	runes := []rune(comment)
@@ -23,11 +27,6 @@ func lowercaseFirstWord(comment string) string {
 		}
 	}
 	return string(runes)
-}
-
-// Checks if the string is a URL
-func isURL(text string) bool {
-	return strings.HasPrefix(text, "http://") || strings.HasPrefix(text, "https://")
 }
 
 func main() {
@@ -72,7 +71,6 @@ func processFile(fileName string, writeBack bool) {
 	var (
 		lines       []string
 		needsFixing bool
-		inBlock     bool
 		blockStart  int
 	)
 
@@ -85,23 +83,18 @@ func processFile(fileName string, writeBack bool) {
 		if strings.HasPrefix(trimmed, "// ") {
 			comment := strings.TrimPrefix(trimmed, "// ")
 
-			if !inBlock {
-				inBlock = true
-				blockStart = len(lines) - 1
+			blockStart = len(lines) - 1
 
-				// Extract leading whitespace
-				leadingWhitespace := line[:strings.Index(line, "// ")]
+			// Extract leading whitespace
+			leadingWhitespace := line[:strings.Index(line, "// ")]
 
-				firstWord := strings.Fields(comment)[0]
-				if !isURL(firstWord) && unicode.IsLower(rune(firstWord[0])) {
-					fmt.Printf("%s:%d: %s\n", fileName, blockStart+1, line)
-					lowercased := lowercaseFirstWord(comment)
-					lines[blockStart] = leadingWhitespace + "// " + lowercased
-					needsFixing = true
-				}
+			firstWord := strings.Fields(comment)[0]
+			if !exempt(firstWord) && unicode.IsUpper(rune(firstWord[0])) {
+				fmt.Printf("%s:%d: %s\n", fileName, blockStart+1, line)
+				lowercased := lowercaseFirstWord(comment)
+				lines[blockStart] = leadingWhitespace + "// " + lowercased
+				needsFixing = true
 			}
-		} else {
-			inBlock = false
 		}
 	}
 
