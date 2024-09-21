@@ -12,7 +12,7 @@ import (
 )
 
 func exempt(text string) bool {
-	return strings.HasPrefix(text, "http://") || strings.HasPrefix(text, "https://") || strings.HasPrefix(text, "SORT")
+	return unicode.IsUpper(rune(text[1]))
 }
 
 func lowercaseFirstWord(comment string) string {
