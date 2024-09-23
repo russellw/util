@@ -8,7 +8,7 @@ import (
 	"regexp"
 )
 
-var fnRe = regexp.MustCompile(`^function\s+(\w+)`)
+var fnRe = regexp.MustCompile(`^(export\s+)?function\s+(\w+)`)
 var writeBack bool
 
 func main() {
@@ -43,7 +43,7 @@ func processFile(path string) {
 			s = trimPrefixOrEmpty(s, dent)
 			match := fnRe.FindStringSubmatch(s)
 			if len(match) > 1 {
-				return match[1] // Return the function name (first captured group)
+				return match[2] // Return the function name 
 			}
 			return ""
 		}
