@@ -1,2 +1,2 @@
-go build -ldflags "-s -w" sort-html-attrs.go||exit /b
+go build -ldflags "-s -w"||exit /b
 move *.exe \b
