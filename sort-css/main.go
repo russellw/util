@@ -73,8 +73,8 @@ func ProcessHTML(r io.Reader) (string, error) {
 				result.WriteString("<style>\n")
 				result.WriteString(sortedCSS)
 				result.WriteString("</style>")
-			}else{
-			result.WriteString(renderToken(token))
+			} else {
+				result.WriteString(renderToken(token))
 			}
 		}
 	}
