@@ -34,6 +34,10 @@ func ProcessHTML(r io.Reader) (string, error) {
 				return result.String(), nil
 			}
 			return "", tokenizer.Err()
+		case html.DoctypeToken:
+			// Handle the doctype token explicitly to preserve it.
+			token := tokenizer.Token()
+			result.WriteString(fmt.Sprintf("<!doctype %s>\n", token.Data))
 		case html.StartTagToken, html.SelfClosingTagToken:
 			token := tokenizer.Token()
 			token = SortAttributes(token)
