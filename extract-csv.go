@@ -9,6 +9,16 @@ import (
 	"unicode"
 )
 
+// allColumnsBlank checks if all columns in the row are blank
+func allColumnsBlank(columns []string) bool {
+	for _, column := range columns {
+		if column != "" {
+			return false
+		}
+	}
+	return true
+}
+
 func main() {
 	if len(os.Args) < 3 {
 		log.Fatalf("Usage: %s <column_list> <input_file>", os.Args[0])
@@ -72,14 +82,4 @@ func parseColumnList(columnList string) ([]int, error) {
 		indices = append(indices, index)
 	}
 	return indices, nil
-}
-
-// allColumnsBlank checks if all columns in the row are blank
-func allColumnsBlank(columns []string) bool {
-	for _, column := range columns {
-		if column != "" {
-			return false
-		}
-	}
-	return true
 }

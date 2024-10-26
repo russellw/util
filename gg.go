@@ -8,30 +8,12 @@ import (
 	"strings"
 )
 
-func main() {
-	// Step 1: Capture the `git diff` output
-	diffCmd := exec.Command("git", "diff", "--name-status")
-	diffOutput, err := diffCmd.Output()
-	if err != nil {
-		fmt.Println("Error running git diff:", err)
-		return
+// formatFileList formats a list of files to show up to 3 names, with an ellipsis if there are more
+func formatFileList(files []string) string {
+	if len(files) <= 3 {
+		return strings.Join(files, ", ")
 	}
-
-	// Step 2: Generate a commit message based on the diff
-	commitMessage := generateCommitMessage(diffOutput)
-	fmt.Println("Generated commit message:", commitMessage)
-
-	// Step 3: Run `git commit` with the generated message
-	commitCmd := exec.Command("git", "commit", "-m", commitMessage)
-	commitCmd.Stdout = &bytes.Buffer{}
-	commitCmd.Stderr = &bytes.Buffer{}
-	err = commitCmd.Run()
-	if err != nil {
-		fmt.Println("Error running git commit:", err)
-		fmt.Println("Output:", commitCmd.Stderr)
-	} else {
-		fmt.Println("Commit successful!")
-	}
+	return fmt.Sprintf("%s, ...and %d more", strings.Join(files[:3], ", "), len(files)-3)
 }
 
 func generateCommitMessage(diffOutput []byte) string {
@@ -78,10 +60,28 @@ func generateCommitMessage(diffOutput []byte) string {
 	return strings.Join(messageParts, "; ")
 }
 
-// formatFileList formats a list of files to show up to 3 names, with an ellipsis if there are more
-func formatFileList(files []string) string {
-	if len(files) <= 3 {
-		return strings.Join(files, ", ")
+func main() {
+	// Step 1: Capture the `git diff` output
+	diffCmd := exec.Command("git", "diff", "--name-status")
+	diffOutput, err := diffCmd.Output()
+	if err != nil {
+		fmt.Println("Error running git diff:", err)
+		return
 	}
-	return fmt.Sprintf("%s, ...and %d more", strings.Join(files[:3], ", "), len(files)-3)
+
+	// Step 2: Generate a commit message based on the diff
+	commitMessage := generateCommitMessage(diffOutput)
+	fmt.Println("Generated commit message:", commitMessage)
+
+	// Step 3: Run `git commit` with the generated message
+	commitCmd := exec.Command("git", "commit", "-a", "-m", commitMessage)
+	commitCmd.Stdout = &bytes.Buffer{}
+	commitCmd.Stderr = &bytes.Buffer{}
+	err = commitCmd.Run()
+	if err != nil {
+		fmt.Println("Error running git commit:", err)
+		fmt.Println("Output:", commitCmd.Stderr)
+	} else {
+		fmt.Println("Commit successful!")
+	}
 }

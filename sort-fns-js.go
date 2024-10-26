@@ -43,7 +43,7 @@ func processFile(path string) {
 			s = trimPrefixOrEmpty(s, dent)
 			match := fnRe.FindStringSubmatch(s)
 			if len(match) > 1 {
-				return match[2] // Return the function name 
+				return match[2] // Return the function name
 			}
 			return ""
 		}
