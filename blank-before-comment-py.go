@@ -10,7 +10,7 @@ import (
 
 // Function to get the indentation of a line
 func getIndentation(line string) string {
-return line[:len(line)-len(strings.TrimLeft(line, " \t"))]
+	return line[:len(line)-len(strings.TrimLeft(line, " \t"))]
 }
 
 func main() {
