@@ -6,6 +6,7 @@ import (
 	"log"
 	"path/filepath"
 	"regexp"
+	"unicode"
 )
 
 var fnRe = regexp.MustCompile(`^def\s+(\w+)`)
@@ -20,11 +21,13 @@ func beginFn(s string) string {
 }
 
 func endFn(s string) EndSpecialKind {
-	// TODO
-	if s == "}" {
-		return endSpecialInclude
+	if len(s) == 0 {
+		return endSpecialNo
 	}
-	return endSpecialNo
+	if unicode.IsSpace(rune(s[0])) {
+		return endSpecialNo
+	}
+	return endSpecialExclude
 }
 
 func main() {
