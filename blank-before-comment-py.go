@@ -8,6 +8,11 @@ import (
 	"strings"
 )
 
+// Function to get the indentation of a line
+func getIndentation(line string) string {
+return line[:len(line)-len(strings.TrimLeft(line, " \t"))]
+}
+
 func main() {
 	// Parsing command-line flags and arguments
 	writeFlag := flag.Bool("w", false, "Write changes back to the file")
@@ -49,8 +54,13 @@ func main() {
 		if strings.TrimSpace(line) != "" && strings.HasPrefix(strings.TrimSpace(line), "#") {
 			// Check if it's preceded by a non-blank, non-comment line with same indentation
 			if i > 0 && strings.TrimSpace(lines[i-1]) != "" && !strings.HasPrefix(strings.TrimSpace(lines[i-1]), "#") {
-				// Insert a blank line before the comment
-				result = append(result, "")
+				// Check indentation of the previous line
+				prevIndent := getIndentation(lines[i-1])
+				currIndent := getIndentation(line)
+				if prevIndent == currIndent {
+					// Insert a blank line before the comment
+					result = append(result, "")
+				}
 			}
 		}
 		// Add the current line to the result
