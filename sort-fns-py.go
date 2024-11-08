@@ -50,7 +50,6 @@ func processFile(path string) {
 	old := lines
 	chunks := parseChunks(isComment, beginFn, endFn, lines)
 	sortChunks(chunks)
-	specialSpace(chunks)
 	lines = joinChunks(chunks)
 	if eqStrings(old, lines) {
 		return
