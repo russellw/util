@@ -26,5 +26,4 @@ go.work.sum
 
 build/
 dist/
-notes.txt
 __pycache__/
