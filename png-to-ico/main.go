@@ -6,18 +6,27 @@ import (
 	"image"
 	"image/png"
 	"os"
+	"path/filepath"
+	"strings"
 
 	"github.com/Kodeworks/golang-image-ico"
 	"golang.org/x/image/draw"
 )
 
 func main() {
-	inputFile := flag.String("input", "input.png", "Path to input PNG file")
-	outputFile := flag.String("output", "output.ico", "Path to output ICO file")
+	// Parse the input file as a positional argument
 	flag.Parse()
+	if flag.NArg() < 1 {
+		fmt.Println("Usage: png-to-ico <input.png>")
+		return
+	}
+	inputFile := flag.Arg(0)
+
+	// Set the output file name by changing the extension to .ico
+	outputFile := strings.TrimSuffix(inputFile, filepath.Ext(inputFile)) + ".ico"
 
 	// Open the PNG file
-	file, err := os.Open(*inputFile)
+	file, err := os.Open(inputFile)
 	if err != nil {
 		fmt.Println("Error opening input file:", err)
 		return
@@ -35,7 +44,7 @@ func main() {
 	sizes := []int{16, 32, 48, 64, 128, 256}
 
 	// Create an ICO file
-	icoFile, err := os.Create(*outputFile)
+	icoFile, err := os.Create(outputFile)
 	if err != nil {
 		fmt.Println("Error creating ICO file:", err)
 		return
@@ -51,7 +60,7 @@ func main() {
 		}
 	}
 
-	fmt.Println("ICO file created successfully:", *outputFile)
+	fmt.Println("ICO file created successfully:", outputFile)
 }
 
 // resizeImage resizes the source image to the specified width and height
