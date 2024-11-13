@@ -59,7 +59,8 @@ func main() {
 	}
 
 	// Define icon sizes (for Windows compatibility)
-	sizes := []int{16, 32, 48, 64, 128, 256}
+	//sizes := []int{16, 32, 48, 64, 128, 256}
+	sizes := []int{16, 32, 48}
 	entries := make([]IconDirEntry, len(sizes))
 	imageData := make([][]byte, len(sizes))
 
