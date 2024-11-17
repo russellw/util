@@ -21,35 +21,6 @@ type Chunk struct {
 	CRC    uint32
 }
 
-func main() {
-	// Get filenames from command-line arguments or glob for PNG files in the current directory.
-	var filenames []string
-	if len(os.Args) > 1 {
-		filenames = expandGlobs(os.Args[1:])
-	} else {
-		var err error
-		filenames, err = filepath.Glob("*.png")
-		if err != nil {
-			fmt.Println("Error finding PNG files:", err)
-			return
-		}
-	}
-
-	if len(filenames) == 0 {
-		fmt.Println("No PNG files found.")
-		return
-	}
-
-	// Inspect each file.
-	for _, filename := range filenames {
-		fmt.Printf("Inspecting file: %s\n", filename)
-		if err := inspectPNG(filename); err != nil {
-			fmt.Printf("Error inspecting %s: %v\n", filename, err)
-		}
-		fmt.Println(strings.Repeat("-", 40))
-	}
-}
-
 // expandGlobs handles globbing for filenames, ensuring compatibility with Windows.
 func expandGlobs(args []string) []string {
 	var result []string
@@ -84,6 +55,35 @@ func inspectPNG(filename string) error {
 
 	printChunks(chunks)
 	return nil
+}
+
+func main() {
+	// Get filenames from command-line arguments or glob for PNG files in the current directory.
+	var filenames []string
+	if len(os.Args) > 1 {
+		filenames = expandGlobs(os.Args[1:])
+	} else {
+		var err error
+		filenames, err = filepath.Glob("*.png")
+		if err != nil {
+			fmt.Println("Error finding PNG files:", err)
+			return
+		}
+	}
+
+	if len(filenames) == 0 {
+		fmt.Println("No PNG files found.")
+		return
+	}
+
+	// Inspect each file.
+	for _, filename := range filenames {
+		fmt.Printf("Inspecting file: %s\n", filename)
+		if err := inspectPNG(filename); err != nil {
+			fmt.Printf("Error inspecting %s: %v\n", filename, err)
+		}
+		fmt.Println(strings.Repeat("-", 40))
+	}
 }
 
 // parseChunks reads chunks from PNG data.

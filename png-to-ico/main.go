@@ -30,11 +30,6 @@ type IconDirEntry struct {
 	ImageOffset uint32 // Offset of the image data from the start of the file
 }
 
-// Resize image to specified dimensions
-func resizeImage(img image.Image, width, height int) image.Image {
-	return resize.Resize(uint(width), uint(height), img, resize.Lanczos3)
-}
-
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Println("Usage: png-to-ico <input.png>")
@@ -59,7 +54,7 @@ func main() {
 	}
 
 	// Define icon sizes (for Windows compatibility)
-	//sizes := []int{16, 32, 48, 64, 128, 256}
+	// sizes := []int{16, 32, 48, 64, 128, 256}
 	sizes := []int{16, 32, 48}
 	entries := make([]IconDirEntry, len(sizes))
 	imageData := make([][]byte, len(sizes))
@@ -131,4 +126,9 @@ func main() {
 	}
 
 	fmt.Println("ICO file created successfully:", outputFile)
+}
+
+// Resize image to specified dimensions
+func resizeImage(img image.Image, width, height int) image.Image {
+	return resize.Resize(uint(width), uint(height), img, resize.Lanczos3)
 }
