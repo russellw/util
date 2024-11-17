@@ -1,2 +1,2 @@
-go build -ldflags "-s -w" %* common.go||exit /b
+go build -ldflags "-s -w" %*||exit /b
 move *.exe \b
