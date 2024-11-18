@@ -27,3 +27,4 @@ go.work.sum
 build/
 dist/
 __pycache__/
+target/
