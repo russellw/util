@@ -30,3 +30,4 @@ __pycache__/
 target/
 *.svg
 *.png
+*.lock
