@@ -1,7 +1,7 @@
 use std::env;
 use std::fs::File;
 use std::process;
-use image::{DynamicImage, GenericImageView, ImageOutputFormat};
+use image::{GenericImageView, ImageOutputFormat};
 use image::imageops::FilterType;
 
 fn main() {
