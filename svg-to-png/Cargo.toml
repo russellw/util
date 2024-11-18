@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-resvg = "0.30.0"
+resvg = "0.44"
 tiny-skia = "0.11.4"
 
 [profile.release]

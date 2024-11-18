@@ -1,5 +1,5 @@
-use resvg::usvg::{Options, TreeParsing};
-use resvg::tiny_skia::{Pixmap, Transform};
+use resvg::usvg::{Options, Tree};
+use resvg::tiny_skia::{Pixmap};
 use std::env;
 use std::fs;
 use std::path::Path;
@@ -41,7 +41,7 @@ fn main() {
 
     // Parse the SVG
     let options = Options::default();
-    let tree = resvg::usvg::Tree::from_data(&svg_data, &options).unwrap_or_else(|err| {
+    let tree = Tree::from_data(&svg_data, &options).unwrap_or_else(|err| {
         eprintln!("Failed to parse SVG: {}", err);
         std::process::exit(1);
     });
@@ -53,17 +53,10 @@ fn main() {
     });
 
     // Render SVG to Pixmap
-    resvg::render(
-        &tree,
-        resvg::FitTo::Size(width, height),
-        Transform::default(),
-        pixmap.as_mut(),
-    )
-    .ok_or_else(|| {
-        eprintln!("Failed to render SVG");
+    tree.render_to_pixmap(pixmap.as_mut(), width, height).unwrap_or_else(|err| {
+        eprintln!("Failed to render SVG: {}", err);
         std::process::exit(1);
-    })
-    .unwrap();
+    });
 
     // Save Pixmap as PNG
     pixmap.save_png(&output_file).unwrap_or_else(|err| {
