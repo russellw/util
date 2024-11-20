@@ -1,9 +1,12 @@
-import inspect
 import csv
+import inspect
 from io import StringIO
+
+
 def dbg(a):
     info = inspect.getframeinfo(inspect.currentframe().f_back)
     print(f"{info.filename}:{info.function}:{info.lineno}: {a}")
+
 
 def dicts_to_csv(dict_list):
     if not dict_list:
@@ -28,8 +31,10 @@ def dicts_to_csv(dict_list):
     # Write each row
     for d in dict_list:
         # Handle lists by joining their elements into a space-separated string
-        processed_row = {key: ' '.join(value) if isinstance(value, list) else value
-                         for key, value in d.items()}
+        processed_row = {
+            key: " ".join(value) if isinstance(value, list) else value
+            for key, value in d.items()
+        }
         writer.writerow(processed_row)
 
     # Return the CSV content as a string
