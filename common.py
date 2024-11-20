@@ -1,5 +1,9 @@
+import inspect
 import csv
 from io import StringIO
+def dbg(a):
+    info = inspect.getframeinfo(inspect.currentframe().f_back)
+    print(f"{info.filename}:{info.function}:{info.lineno}: {a}")
 
 def dicts_to_csv(dict_list):
     if not dict_list:
