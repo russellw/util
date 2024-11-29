@@ -80,9 +80,9 @@ func main() {
 
 	// Run `git commit`
 	commitCmd := exec.Command("git", "commit", "-m", commitMessage)
-       commitCmd.Stdout = &bytes.Buffer{}
-       commitCmd.Stderr = &bytes.Buffer{}	
-err = commitCmd.Run()
+	commitCmd.Stdout = &bytes.Buffer{}
+	commitCmd.Stderr = &bytes.Buffer{}
+	err = commitCmd.Run()
 	if err != nil {
 		fmt.Println("Error running git commit:", err)
 		fmt.Println("Output:", commitCmd.Stderr)
