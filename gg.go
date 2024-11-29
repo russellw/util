@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"os"
 	"os/exec"
 	"regexp"
 	"strings"
@@ -17,24 +18,20 @@ func formatFileList(files []string) string {
 }
 
 func generateCommitMessage(diffOutput []byte) string {
-	// Parse the diff output into changed files and their types
 	changedFiles := map[string][]string{
 		"A": {}, // Added files
 		"M": {}, // Modified files
 		"D": {}, // Deleted files
 	}
 
-	// Process each line of diff output
 	lines := strings.Split(string(diffOutput), "\n")
 	for _, line := range lines {
-		// Match lines of the form "<status>\t<filename>"
 		if match := regexp.MustCompile(`^(A|M|D)\t(.+)$`).FindStringSubmatch(line); match != nil {
 			status, file := match[1], match[2]
 			changedFiles[status] = append(changedFiles[status], file)
 		}
 	}
 
-	// Construct the message based on changes, including file names
 	var messageParts []string
 	for action, files := range changedFiles {
 		if len(files) > 0 {
@@ -52,7 +49,6 @@ func generateCommitMessage(diffOutput []byte) string {
 		}
 	}
 
-	// Default to "Updated files" if no specific actions were found
 	if len(messageParts) == 0 {
 		return "Updated files"
 	}
@@ -69,11 +65,16 @@ func main() {
 		return
 	}
 
-	// Step 2: Generate a commit message based on the diff
-	commitMessage := generateCommitMessage(diffOutput)
-	fmt.Println("Generated commit message:", commitMessage)
+	// Step 2: Generate or use provided commit message
+	var commitMessage string
+	if len(os.Args) > 1 {
+		commitMessage = os.Args[1] // Use provided commit message
+	} else {
+		commitMessage = generateCommitMessage(diffOutput) // Generate commit message
+	}
+	fmt.Println("Commit message:", commitMessage)
 
-	// Step 3: Run `git commit` with the generated message
+	// Step 3: Run `git commit` with the message
 	commitCmd := exec.Command("git", "commit", "-a", "-m", commitMessage)
 	commitCmd.Stdout = &bytes.Buffer{}
 	commitCmd.Stderr = &bytes.Buffer{}
@@ -81,7 +82,30 @@ func main() {
 	if err != nil {
 		fmt.Println("Error running git commit:", err)
 		fmt.Println("Output:", commitCmd.Stderr)
+		return
+	}
+	fmt.Println("Commit successful!")
+
+	// Step 4: Check if a remote repository exists
+	remoteCmd := exec.Command("git", "remote")
+	remoteOutput, err := remoteCmd.Output()
+	if err != nil {
+		fmt.Println("Error checking git remote:", err)
+		return
+	}
+
+	if len(remoteOutput) > 0 { // Remote repository exists
+		fmt.Println("Remote repository detected, pushing changes...")
+		pushCmd := exec.Command("git", "push")
+		pushCmd.Stdout = os.Stdout
+		pushCmd.Stderr = os.Stderr
+		err = pushCmd.Run()
+		if err != nil {
+			fmt.Println("Error running git push:", err)
+			return
+		}
+		fmt.Println("Push successful!")
 	} else {
-		fmt.Println("Commit successful!")
+		fmt.Println("No remote repository found. Skipping push.")
 	}
 }
