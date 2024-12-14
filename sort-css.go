@@ -10,7 +10,7 @@ import (
 
 // Rule represents a CSS rule.
 type Rule struct {
-	Selector    string
+	Selectors   []string
 	Properties  []string
 	NestedRules []Rule
 }
@@ -30,7 +30,11 @@ func parseCSS(input string) []Rule {
 		if strings.HasSuffix(line, "{") {
 			// Start of a new rule.
 			selector := strings.TrimSpace(strings.TrimSuffix(line, "{"))
-			stack = append(stack, Rule{Selector: selector})
+			selectors := strings.Split(selector, ",")
+			for i := range selectors {
+				selectors[i] = strings.TrimSpace(selectors[i])
+			}
+			stack = append(stack, Rule{Selectors: selectors})
 		} else if line == "}" {
 			// End of a rule.
 			if len(stack) == 0 {
@@ -46,12 +50,11 @@ func parseCSS(input string) []Rule {
 				rules = append(rules, current)
 			}
 		} else {
-			// Property or nested selector line.
+			// Property line.
 			if len(stack) == 0 {
 				panic("Property outside of any rule detected")
 			}
 
-			// Check if this line starts with a valid property or is part of a nested rule.
 			if strings.Contains(line, ":") {
 				stack[len(stack)-1].Properties = append(stack[len(stack)-1].Properties, line)
 			} else {
@@ -70,10 +73,11 @@ func parseCSS(input string) []Rule {
 // sortRules sorts rules and their properties alphabetically.
 func sortRules(rules []Rule) {
 	sort.Slice(rules, func(i, j int) bool {
-		return rules[i].Selector < rules[j].Selector
+		return strings.Join(rules[i].Selectors, ", ") < strings.Join(rules[j].Selectors, ", ")
 	})
 
 	for i := range rules {
+		sort.Strings(rules[i].Selectors)
 		sort.Strings(rules[i].Properties)
 		sortRules(rules[i].NestedRules)
 	}
@@ -84,7 +88,7 @@ func stringifyRules(rules []Rule, indent string) string {
 	var builder strings.Builder
 
 	for _, rule := range rules {
-		builder.WriteString(indent + rule.Selector + " {\n")
+		builder.WriteString(indent + strings.Join(rule.Selectors, ", ") + " {\n")
 		for _, prop := range rule.Properties {
 			builder.WriteString(indent + "  " + prop + "\n")
 		}
