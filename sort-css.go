@@ -172,7 +172,11 @@ func main() {
 	readLines(filename)
 
 	// Parse, sort, and stringify CSS.
-	rules := parseCSS(css)
+	var rules []Rule
+	i := 0
+	for i < len(lines) {
+		rules = append(rules, parseRule(&i))
+	}
 	sortRules(rules)
 	output := stringifyRules(rules, "")
 
