@@ -46,7 +46,7 @@ func processCSS(content string) string {
 	var output []string
 	lines := strings.Split(content, "\n")
 
-	commentRegex := regexp.MustCompile(`//(.*)`)    // Find C++ style comments
+	commentRegex := regexp.MustCompile(`//(.*)`)                 // Find C++ style comments
 	trailingRegex := regexp.MustCompile(`(.+?)(/\*.*?\*/\s*)?$`) // Separate code from trailing comments
 
 	for i := 0; i < len(lines); i++ {

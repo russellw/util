@@ -1,12 +1,12 @@
 package main
 
 import (
-"os"
+	"bufio"
 	"flag"
 	"fmt"
-	"log"
-	"bufio"
 	"io/ioutil"
+	"log"
+	"os"
 	"sort"
 	"strings"
 )
@@ -18,7 +18,7 @@ type Rule struct {
 	NestedRules []Rule
 }
 
-var  lines[]string
+var lines []string
 
 func readLines(path string) {
 	file, err := os.Open(path)
@@ -29,26 +29,26 @@ func readLines(path string) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		lines = append(lines,strings.TrimSpace( scanner.Text()))
+		lines = append(lines, strings.TrimSpace(scanner.Text()))
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func parseRule(i* int ) Rule {
-var selectors[]string
-		for strings.HasSuffix(lines[*i], ",") {
-		s:=lines[*i]
-			s = strings.TrimSuffix(s, "{")
-			s = strings.TrimSpace(s)
-			selectors=append(selectors,s)
-			*i++
-		}
-		if !strings.HasSuffix(lines[*i], "{")  {
-		log.Fatal("syntax error");
+func parseRule(i *int) Rule {
+	var selectors []string
+	for strings.HasSuffix(lines[*i], ",") {
+		s := lines[*i]
+		s = strings.TrimSuffix(s, "{")
+		s = strings.TrimSpace(s)
+		selectors = append(selectors, s)
+		*i++
 	}
-	rule:=Rule{Selectors: selectors}
+	if !strings.HasSuffix(lines[*i], "{") {
+		log.Fatal("syntax error")
+	}
+	rule := Rule{Selectors: selectors}
 	return rule
 }
 
