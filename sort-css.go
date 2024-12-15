@@ -29,7 +29,12 @@ func readLines(path string) {
 
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		lines = append(lines, strings.TrimSpace(scanner.Text()))
+		s := scanner.Text()
+		s = strings.TrimSpace(s)
+		if s == "" {
+			continue
+		}
+		lines = append(lines, s)
 	}
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
@@ -40,23 +45,32 @@ func parseRule(i *int) Rule {
 	var selectors []string
 	for strings.HasSuffix(lines[*i], ",") {
 		s := lines[*i]
+		*i++
 		s = strings.TrimSuffix(s, ",")
 		s = strings.TrimSpace(s)
 		selectors = append(selectors, s)
-		*i++
 	}
 	if !strings.HasSuffix(lines[*i], "{") {
 		log.Fatal("syntax error")
 	}
 	s := lines[*i]
+	*i++
 	s = strings.TrimSuffix(s, "{")
 	s = strings.TrimSpace(s)
 	selectors = append(selectors, s)
-	*i++
 	rule := Rule{selectors: selectors}
-	for *i < len(lines) && lines[*i] != "}" {
-		if strings.HasSuffix(lines[*i], "{") || strings.HasSuffix(lines[*i], ",") {
+	for *i < len(lines) {
+		if lines[*i] == "}" {
+			*i++
+			break
 		}
+		if strings.HasSuffix(lines[*i], "{") || strings.HasSuffix(lines[*i], ",") {
+			rule.rules = append(rule.rules, parseRule(i))
+			continue
+		}
+		s := lines[*i]
+		*i++
+		rule.properties = append(rule.properties, s)
 	}
 	return rule
 }
