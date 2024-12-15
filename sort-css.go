@@ -1,8 +1,11 @@
 package main
 
 import (
+"os"
 	"flag"
 	"fmt"
+	"log"
+	"bufio"
 	"io/ioutil"
 	"sort"
 	"strings"
@@ -15,10 +18,43 @@ type Rule struct {
 	NestedRules []Rule
 }
 
+var  lines[]string
+
+func readLines(path string) {
+	file, err := os.Open(path)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines = append(lines,strings.TrimSpace( scanner.Text()))
+	}
+	if err := scanner.Err(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func parseRule(i* int ) Rule {
+var selectors[]string
+		for strings.HasSuffix(lines[*i], ",") {
+		s:=lines[*i]
+			s = strings.TrimSuffix(s, "{")
+			s = strings.TrimSpace(s)
+			selectors=append(selectors,s)
+			*i++
+		}
+		if !strings.HasSuffix(lines[*i], "{")  {
+		log.Fatal("syntax error");
+	}
+	rule:=Rule{Selectors: selectors}
+	return rule
+}
+
 // parseCSS recursively parses CSS into a slice of Rules.
 func parseCSS(input string) []Rule {
 	var rules []Rule
-	lines := strings.Split(input, "\n")
 	stack := []Rule{}
 
 	for _, line := range lines {
@@ -110,15 +146,7 @@ func main() {
 	}
 
 	// Read the input file.
-	content, err := ioutil.ReadFile(filename)
-	if err != nil {
-		panic(fmt.Sprintf("Failed to read file %s: %v", filename, err))
-	}
-
-	css := string(content)
-	if strings.Contains(css, "/*") || strings.Contains(css, "*/") {
-		panic("Comments are not supported in the input CSS")
-	}
+	readLines(filename)
 
 	// Parse, sort, and stringify CSS.
 	rules := parseCSS(css)
