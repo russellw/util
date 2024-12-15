@@ -26,7 +26,7 @@ func main() {
 	}
 
 	// Get the current timestamp in ISO 8601 format
-	timestamp := time.Now().Format(time.RFC3339)
+	timestamp := time.Now().Format("2006-01-02T15:04:05")
 
 	// Find the closing </style> tag to insert the timestamp after it
 	html := string(content)
