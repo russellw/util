@@ -131,15 +131,14 @@ func parseCSS(input string) []Rule {
 
 // sortRules sorts rules and their properties alphabetically.
 func sortRules(rules []Rule) {
-	sort.Slice(rules, func(i, j int) bool {
-		return strings.Join(rules[i].selectors, ", ") < strings.Join(rules[j].selectors, ", ")
-	})
-
 	for i := range rules {
 		sort.Strings(rules[i].selectors)
 		sort.Strings(rules[i].properties)
 		sortRules(rules[i].rules)
 	}
+	sort.Slice(rules, func(i, j int) bool {
+		return strings.Join(rules[i].selectors, ", ") < strings.Join(rules[j].selectors, ", ")
+	})
 }
 
 // stringifyRules converts sorted rules back to a CSS string.
