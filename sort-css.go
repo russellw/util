@@ -108,7 +108,10 @@ func customRank(c byte) int {
 // sortRules sorts rules and their properties alphabetically.
 func sortRules(rules []Rule) {
 	for i := range rules {
-		sort.Strings(rules[i].selectors)
+		selectors := rules[i].selectors
+		sort.Slice(selectors, func(i, j int) bool {
+			return customLess(selectors[i], selectors[j])
+		})
 		sort.Strings(rules[i].properties)
 		sortRules(rules[i].rules)
 	}
