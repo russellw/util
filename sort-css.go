@@ -75,60 +75,6 @@ func parseRule(i *int) Rule {
 	return rule
 }
 
-// parseCSS recursively parses CSS into a slice of Rules.
-func parseCSS(input string) []Rule {
-	var rules []Rule
-	stack := []Rule{}
-
-	for _, line := range lines {
-		line = strings.TrimSpace(line)
-		if line == "" {
-			continue
-		}
-
-		if strings.HasSuffix(line, "{") {
-			// Start of a new rule.
-			selector := strings.TrimSpace(strings.TrimSuffix(line, "{"))
-			selectors := strings.Split(selector, ",")
-			for i := range selectors {
-				selectors[i] = strings.TrimSpace(selectors[i])
-			}
-			stack = append(stack, Rule{selectors: selectors})
-		} else if line == "}" {
-			// End of a rule.
-			if len(stack) == 0 {
-				panic("Unbalanced braces detected in CSS")
-			}
-
-			current := stack[len(stack)-1]
-			stack = stack[:len(stack)-1]
-
-			if len(stack) > 0 {
-				stack[len(stack)-1].rules = append(stack[len(stack)-1].rules, current)
-			} else {
-				rules = append(rules, current)
-			}
-		} else {
-			// Property line.
-			if len(stack) == 0 {
-				panic("Property outside of any rule detected")
-			}
-
-			if strings.Contains(line, ":") {
-				stack[len(stack)-1].properties = append(stack[len(stack)-1].properties, line)
-			} else {
-				panic("Unexpected line in CSS: " + line)
-			}
-		}
-	}
-
-	if len(stack) != 0 {
-		panic("Unbalanced braces detected in CSS")
-	}
-
-	return rules
-}
-
 // sortRules sorts rules and their properties alphabetically.
 func sortRules(rules []Rule) {
 	for i := range rules {
