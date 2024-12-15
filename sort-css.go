@@ -75,6 +75,36 @@ func parseRule(i *int) Rule {
 	return rule
 }
 
+// customLess compares two strings with custom rules:
+// - Letters ('a'-'z', 'A'-'Z') come before '.' and '@'.
+// - '.' comes after letters but before '@'.
+// - '@' comes last.
+func customLess(a, b string) bool {
+	for i := 0; i < len(a) && i < len(b); i++ {
+		ra, rb := customRank(a[i]), customRank(b[i])
+		if ra != rb {
+			return ra < rb
+		}
+	}
+	return len(a) < len(b)
+}
+
+// customRank assigns a rank to a character based on custom rules.
+func customRank(c byte) int {
+	switch {
+	case c >= 'a' && c <= 'z': // Lowercase letters
+		return int(c)
+	case c >= 'A' && c <= 'Z': // Uppercase letters
+		return int(c)
+	case c == '.': // '.' comes after letters
+		return 256
+	case c == '@': // '@' comes after '.'
+		return 257
+	default: // Other characters
+		return 300 + int(c)
+	}
+}
+
 // sortRules sorts rules and their properties alphabetically.
 func sortRules(rules []Rule) {
 	for i := range rules {
@@ -83,7 +113,7 @@ func sortRules(rules []Rule) {
 		sortRules(rules[i].rules)
 	}
 	sort.Slice(rules, func(i, j int) bool {
-		return strings.Join(rules[i].selectors, ", ") < strings.Join(rules[j].selectors, ", ")
+		return customLess(strings.Join(rules[i].selectors, ", "), strings.Join(rules[j].selectors, ", "))
 	})
 }
 
