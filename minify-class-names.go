@@ -94,7 +94,6 @@ func main() {
 			fmt.Printf("Error writing file: %v\n", err)
 			os.Exit(1)
 		}
-		fmt.Println("File successfully overwritten.")
 	} else {
 		fmt.Println(html)
 	}
