@@ -9,6 +9,7 @@ import (
 	"strings"
 )
 
+// Generate single-letter identifiers a-z.
 func generateIdentifiers() []string {
 	ids := []string{}
 	for i := 'a'; i <= 'z'; i++ {
@@ -18,7 +19,7 @@ func generateIdentifiers() []string {
 }
 
 func main() {
-	// Command-line flags
+	// Parse flags
 	write := flag.Bool("w", false, "overwrite the input file")
 	flag.Parse()
 
@@ -29,13 +30,12 @@ func main() {
 
 	filePath := flag.Args()[0]
 
-	// Read the input file
+	// Read the HTML file
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		fmt.Printf("Error reading file: %v\n", err)
 		os.Exit(1)
 	}
-
 	html := string(data)
 
 	// Extract the <style> section
@@ -45,13 +45,13 @@ func main() {
 		fmt.Println("No <style> section found in the HTML.")
 		os.Exit(0)
 	}
-
-	// Process the style content to find class names
 	styleContent := styleMatch[1]
+
+	// Find all class names in the <style> section
 	classRegex := regexp.MustCompile(`\.(\w[\w-]*)\s*{`)
 	classMatches := classRegex.FindAllStringSubmatch(styleContent, -1)
 
-	// Extract unique class names
+	// Collect unique class names
 	classNames := make(map[string]bool)
 	for _, match := range classMatches {
 		classNames[match[1]] = true
@@ -63,7 +63,7 @@ func main() {
 	}
 	sort.Strings(uniqueClassNames)
 
-	// Map class names to short identifiers
+	// Map class names to single-letter identifiers
 	identifiers := generateIdentifiers()
 	if len(uniqueClassNames) > len(identifiers) {
 		fmt.Println("Error: Too many class names to replace with single-letter identifiers.")
@@ -79,17 +79,15 @@ func main() {
 	for className, shortName := range classMap {
 		styleContent = regexp.MustCompile(`\.`+regexp.QuoteMeta(className)+`\b`).ReplaceAllString(styleContent, "."+shortName)
 	}
-
-	// Replace the modified <style> section back into the HTML
 	html = strings.Replace(html, styleMatch[1], styleContent, 1)
 
-	// Replace class names in `class` attributes in the HTML
+	// Replace class names in `class` attributes in the HTML elements
 	for className, shortName := range classMap {
-		classAttrPattern := regexp.MustCompile(`class="([^"]*?)\b` + regexp.QuoteMeta(className) + `\b([^"]*?)"`)
-		html = classAttrPattern.ReplaceAllString(html, `class="$1`+shortName+`$2"`)
+		classAttrPattern := regexp.MustCompile(`class="` + regexp.QuoteMeta(className) + `"`)
+		html = classAttrPattern.ReplaceAllString(html, `class="`+shortName+`"`)
 	}
 
-	// Write the output
+	// Output the modified HTML
 	if *write {
 		err = os.WriteFile(filePath, []byte(html), 0644)
 		if err != nil {
