@@ -98,8 +98,10 @@ func customRank(c byte) int {
 		return int(c)
 	case c == '.': // '.' comes after letters
 		return 256
-	case c == '@': // '@' comes after '.'
+	case c == '#':
 		return 257
+	case c == '@': // '@' comes after '.'
+		return 258
 	default: // Other characters
 		return 300 + int(c)
 	}

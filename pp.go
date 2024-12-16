@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	definePattern = regexp.MustCompile(`^#define\s+(\w+)\s+(.+)$`)
+	definePattern  = regexp.MustCompile(`^#define\s+(\w+)\s+(.+)$`)
 	includePattern = regexp.MustCompile(`^#include\s+"([^"]+)"$`)
 )
 
