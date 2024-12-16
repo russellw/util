@@ -24,6 +24,10 @@ func NewPreprocessor() *Preprocessor {
 	}
 }
 
+func isAbsolutePath(path string) bool {
+	return strings.HasPrefix(path, "/") || strings.HasPrefix(path, "\\")
+}
+
 func (p *Preprocessor) ProcessFile(filename string) string {
 	file, err := os.Open(filename)
 	if err != nil {
@@ -44,7 +48,7 @@ func (p *Preprocessor) ProcessFile(filename string) string {
 		} else if includeMatch := includePattern.FindStringSubmatch(line); includeMatch != nil {
 			// Handle #include
 			includeFile := includeMatch[1]
-			if !filepath.IsAbs(includeFile) {
+			if !isAbsolutePath(includeFile) {
 				includeFile = filepath.Join(filepath.Dir(filename), includeFile)
 			}
 			includedContent := p.ProcessFile(includeFile)
