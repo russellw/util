@@ -1,4 +1,4 @@
-use palette::{Hsla, LinSrgb};
+use palette::{Hsla, Rgb, Srgba};
 use regex::Regex;
 use std::{env, fs, process};
 
@@ -29,9 +29,12 @@ fn main() {
         let l: f32 = caps[3].parse().unwrap_or(0.0);
         let a: f32 = caps[4].parse().unwrap_or(1.0);
 
-        // Convert HSLA to RGBA
-        let hsla = Hsla::new(h, s / 100.0, l / 100.0, a);
-        let rgba: LinSrgb = hsla.into();
+        // Convert HSLA to RGB
+        let hsla = Hsla::new(h, s / 100.0, l / 100.0);
+        let rgb: Rgb = hsla.into(); // Convert HSLA to RGB
+
+        // Convert RGB to RGBA by adding alpha
+        let rgba = Srgba::new(rgb.red, rgb.green, rgb.blue, a);
 
         // Convert RGBA to hex format
         format!(
@@ -45,7 +48,7 @@ fn main() {
 
     // Output the updated content
     if overwrite {
-        fs::write(input_file, updated_content).unwrap_or_else(|err| {
+        fs::write(input_file, updated_content.to_string()).unwrap_or_else(|err| {
             eprintln!("Error writing to file {}: {}", input_file, err);
             process::exit(1);
         });
