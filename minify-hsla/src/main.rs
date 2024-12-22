@@ -1,4 +1,5 @@
 use palette::{Hsla, LinSrgb};
+use regex::Regex;
 use std::{env, fs, process};
 
 fn main() {
@@ -18,30 +19,29 @@ fn main() {
         process::exit(1);
     });
 
-    // Process the content
-    let updated_content = content.replace(
-        r"hsla\((\d+),\s*(\d+)%\s*,\s*(\d+)%\s*,\s*([\d\.]+)\)",
-        |caps: &regex::Captures| {
-            let h: f32 = caps[1].parse().unwrap_or(0.0);
-            let s: f32 = caps[2].parse().unwrap_or(0.0);
-            let l: f32 = caps[3].parse().unwrap_or(0.0);
-            let a: f32 = caps[4].parse().unwrap_or(1.0);
+    // Define the regex pattern for HSLA colors
+    let re = Regex::new(r"hsla\((\d+),\s*(\d+)%\s*,\s*(\d+)%\s*,\s*([\d\.]+)\)").unwrap();
 
-            // Convert HSLA to RGBA
-            let hsla = Hsla::new(h, s / 100.0, l / 100.0, a);
-            let rgba: LinSrgb = hsla.into();
+    // Process the content using the regex
+    let updated_content = re.replace_all(&content, |caps: &regex::Captures| {
+        let h: f32 = caps[1].parse().unwrap_or(0.0);
+        let s: f32 = caps[2].parse().unwrap_or(0.0);
+        let l: f32 = caps[3].parse().unwrap_or(0.0);
+        let a: f32 = caps[4].parse().unwrap_or(1.0);
 
-            // Convert RGBA to hex format
-            let hex = format!(
-                "#{:02x}{:02x}{:02x}{:02x}",
-                (rgba.red * 255.0) as u8,
-                (rgba.green * 255.0) as u8,
-                (rgba.blue * 255.0) as u8,
-                (rgba.alpha * 255.0) as u8
-            );
-            hex
-        },
-    );
+        // Convert HSLA to RGBA
+        let hsla = Hsla::new(h, s / 100.0, l / 100.0, a);
+        let rgba: LinSrgb = hsla.into();
+
+        // Convert RGBA to hex format
+        format!(
+            "#{:02x}{:02x}{:02x}{:02x}",
+            (rgba.red * 255.0) as u8,
+            (rgba.green * 255.0) as u8,
+            (rgba.blue * 255.0) as u8,
+            (rgba.alpha * 255.0) as u8
+        )
+    });
 
     // Output the updated content
     if overwrite {
