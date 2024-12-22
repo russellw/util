@@ -100,7 +100,11 @@ func renderToken(token html.Token) string {
 		sb.WriteString("<")
 		sb.WriteString(token.Data)
 		for _, attr := range token.Attr {
-			sb.WriteString(fmt.Sprintf(` %s="%s"`, attr.Key, attr.Val))
+			if attr.Val == "" {
+				sb.WriteString(fmt.Sprintf(` %s`, attr.Key))
+			} else {
+				sb.WriteString(fmt.Sprintf(` %s="%s"`, attr.Key, attr.Val))
+			}
 		}
 		if token.Type == html.SelfClosingTagToken {
 			sb.WriteString("/>")
