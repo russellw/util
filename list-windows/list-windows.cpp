@@ -1,5 +1,6 @@
 #include <windows.h>
 #include <iostream>
+#include <iomanip>
 #include <string>
 #include <sstream>
 
@@ -31,9 +32,10 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
         std::string title, className;
         DWORD processID;
         if (GetWindowInfo(hwnd, title, className, processID)) {
-            *output << "Title: " << title << "\n"
-                    << "Class: " << className << "\n"
-                    << "Process ID: " << processID << "\n\n";
+            // Adjust columns for fixed-width output
+            *output << std::setw(10) << processID << " " // Process ID: width 10
+                    << std::setw(30) << std::left << className << " " // Class Name: width 30
+                    << title.substr(0, 50) << "\n"; // Title: truncate to 50 chars if too long
         }
     }
     return TRUE;
@@ -41,6 +43,12 @@ BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
 
 int main() {
     std::ostringstream output;
+
+    // Print header row
+    output << std::setw(10) << "Proc ID" << " "
+           << std::setw(30) << std::left << "Class Name" << " "
+           << "Title" << "\n";
+    output << std::string(80, '-') << "\n"; // Separator line
 
     if (EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&output))) {
         std::cout << output.str();
