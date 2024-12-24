@@ -1,61 +1,53 @@
-#include <iostream>
 #include <windows.h>
+#include <iostream>
 #include <string>
-#include <vector>
-#include <memory>
+#include <sstream>
 
-struct WindowInfo {
-    HWND hwnd;
-    std::string title;
-    std::string className;
-    DWORD processId;
-    bool isVisible;
-};
+bool GetWindowInfo(HWND hwnd, std::string &title, std::string &className, DWORD &processID) {
+    // Get the window title
+    char windowTitle[256];
+    if (GetWindowTextA(hwnd, windowTitle, sizeof(windowTitle)) == 0) {
+        return false; // Skip windows with no title
+    }
+    title = windowTitle;
+
+    // Get the class name
+    char windowClass[256];
+    if (GetClassNameA(hwnd, windowClass, sizeof(windowClass)) == 0) {
+        return false; // Skip windows with no class name
+    }
+    className = windowClass;
+
+    // Get the process ID
+    GetWindowThreadProcessId(hwnd, &processID);
+
+    return true;
+}
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam) {
-    // Get window title
-    char title[256];
-    GetWindowTextA(hwnd, title, sizeof(title));
+    std::ostringstream *output = reinterpret_cast<std::ostringstream *>(lParam);
 
-    // Get window class name
-    char className[256];
-    GetClassNameA(hwnd, className, sizeof(className));
-
-    // Get process ID
-    DWORD processId;
-    GetWindowThreadProcessId(hwnd, &processId);
-
-    // Check visibility of the window
-    bool isVisible = IsWindowVisible(hwnd);
-
-    // Store the window info in the vector
-    std::vector<WindowInfo>* windows = reinterpret_cast<std::vector<WindowInfo>*>(lParam);
-    windows->emplace_back(WindowInfo{ hwnd, title, className, processId, isVisible });
-
+    if (IsWindowVisible(hwnd)) {
+        std::string title, className;
+        DWORD processID;
+        if (GetWindowInfo(hwnd, title, className, processID)) {
+            *output << "Title: " << title << "\n"
+                    << "Class: " << className << "\n"
+                    << "Process ID: " << processID << "\n\n";
+        }
+    }
     return TRUE;
 }
 
-void PrintWindowInfo(const std::vector<WindowInfo>& windows) {
-    std::cout << "List of currently open windows:" << std::endl;
-    std::cout << "--------------------------------" << std::endl;
-    for (const auto& win : windows) {
-        std::cout << "HWND: " << win.hwnd << std::endl;
-        std::cout << "Title: \"" << win.title << "\"" << std::endl;
-        std::cout << "Class Name: " << win.className << std::endl;
-        std::cout << "Process ID: " << win.processId << std::endl;
-        std::cout << "Visible: " << (win.isVisible ? "Yes" : "No") << std::endl;
-        std::cout << "--------------------------------" << std::endl;
-    }
-}
-
 int main() {
-    std::vector<WindowInfo> windows;
+    std::ostringstream output;
 
-    // Enumerate all top-level windows
-    EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&windows));
-
-    // Print the collected information
-    PrintWindowInfo(windows);
+    if (EnumWindows(EnumWindowsProc, reinterpret_cast<LPARAM>(&output))) {
+        std::cout << output.str();
+    } else {
+        std::cerr << "Failed to enumerate windows.\n";
+        return 1;
+    }
 
     return 0;
 }
