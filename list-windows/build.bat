@@ -1,1 +1,1 @@
-cl /O2 list-windows.cpp /EHsc /link User32.lib
+cl /O2 /wd4530 list-windows.cpp /link User32.lib
