@@ -1,4 +1,4 @@
-use palette::{rgb::Rgb, Hsla, Srgba};
+use palette::{rgb::Srgb, Hsla, Srgba};
 use regex::Regex;
 use std::{env, fs, process};
 
@@ -31,18 +31,15 @@ fn main() {
 
         // Convert HSLA to RGB
         let hsla = Hsla::new(h, s / 100.0, l / 100.0, a);
-        let rgb: Rgb = hsla.into(); // Convert HSLA to RGB
+        let srgb: Srgba = Srgba::from(hsla); // Convert HSLA to SRGBA
 
-        // Convert RGB to RGBA by adding alpha
-        let rgba = Srgba::new(rgb.red, rgb.green, rgb.blue, hsla.alpha);
-
-        // Convert RGBA to hex format
+        // Convert SRGBA to hex format
         format!(
             "#{:02x}{:02x}{:02x}{:02x}",
-            (rgba.red * 255.0) as u8,
-            (rgba.green * 255.0) as u8,
-            (rgba.blue * 255.0) as u8,
-            (rgba.alpha * 255.0) as u8
+            (srgb.red * 255.0) as u8,
+            (srgb.green * 255.0) as u8,
+            (srgb.blue * 255.0) as u8,
+            (srgb.alpha * 255.0) as u8
         )
     });
 
