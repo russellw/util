@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Live Cell Counter</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    #upload-section {
+      margin-bottom: 20px;
+    }
+    #result {
+      font-weight: bold;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Excel Live Cell Counter</h1>
+  <div id="upload-section">
+    <label for="file-input">Upload your Excel file:</label>
+    <input type="file" id="file-input" accept=".xls,.xlsx" />
+  </div>
+  <div id="result">Live cells: 0</div>
+
+  <script>
+    document.getElementById('file-input').addEventListener('change', handleFileUpload);
+
+    function handleFileUpload(event) {
+      const file = event.target.files[0];
+      if (!file) {
+        alert('Please select a file.');
+        return;
+      }
+
+      const reader = new FileReader();
+
+      reader.onload = function (e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        let liveCellCount = 0;
+
+        // Iterate through all sheets in the workbook
+        workbook.SheetNames.forEach((sheetName) => {
+          const sheet = workbook.Sheets[sheetName];
+          const cells = Object.keys(sheet);
+
+          // Count non-empty cells (skip metadata like "!ref")
+          cells.forEach((cell) => {
+            if (cell[0] !== "!" && sheet[cell].v !== undefined && sheet[cell].v !== "") {
+              liveCellCount++;
+            }
+          });
+        });
+
+        document.getElementById('result').textContent = `Live cells: ${liveCellCount}`;
+      };
+
+      reader.readAsArrayBuffer(file);
+    }
+  </script>
+</body>
+</html>
