@@ -31,24 +31,22 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Print("<table>")
+	fmt.Println("<table>")
 
 	if *headerFlag && len(rows) > 0 {
-		fmt.Print("<tr>")
+		fmt.Println("<tr>")
 		for _, col := range rows[0] {
-			fmt.Printf("<th>%s</th>", col)
+			fmt.Printf("<th>%s\n", col)
 		}
-		fmt.Print("</tr>")
 		rows = rows[1:]
 	}
 
 	for _, row := range rows {
-		fmt.Print("<tr>")
+		fmt.Println("<tr>")
 		for _, col := range row {
-			fmt.Printf("<td>%s</td>", col)
+			fmt.Printf("<td>%s\n", col)
 		}
-		fmt.Print("</tr>")
 	}
 
-	fmt.Print("</table>")
+	fmt.Println("</table>")
 }
