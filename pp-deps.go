@@ -11,11 +11,12 @@ import (
 
 // isAbsolutePath checks if a file path is absolute on Windows.
 func isAbsolutePath(path string) bool {
-	// On Windows, an absolute path starts with a drive letter and a colon (e.g., "C:\\")
-	if len(path) < 3 {
-		return false
+	// Check if the path starts with a backslash or forward slash, indicating an absolute path relative to the current drive
+	if strings.HasPrefix(path, "\\") || strings.HasPrefix(path, "/") {
+		return true
 	}
-	return strings.HasPrefix(path, "\\\\") || (path[1] == ':' && (path[2] == '\\' || path[2] == '/'))
+	// Check for UNC paths or paths with drive letters (e.g., "C:\")
+	return len(path) >= 3 && path[1] == ':' && (path[2] == '\\' || path[2] == '/')
 }
 
 // findDependencies recursively finds all dependencies of the given file.
