@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -23,20 +24,35 @@ func main() {
 	write := flag.Bool("w", false, "overwrite the input file")
 	flag.Parse()
 
-	if len(flag.Args()) != 1 {
-		fmt.Println("Usage: go run main.go [-w] <file.html>")
+	var html string
+
+	if len(flag.Args()) == 1 {
+		filePath := flag.Args()[0]
+
+		// Read the HTML file
+		data, err := os.ReadFile(filePath)
+		if err != nil {
+			fmt.Printf("Error reading file: %v\n", err)
+			os.Exit(1)
+		}
+		html = string(data)
+	} else if len(flag.Args()) == 0 {
+		// Read HTML content from standard input
+		fmt.Println("Reading from standard input (end input with EOF)...")
+		scanner := bufio.NewScanner(os.Stdin)
+		var builder strings.Builder
+		for scanner.Scan() {
+			builder.WriteString(scanner.Text() + "\n")
+		}
+		if err := scanner.Err(); err != nil {
+			fmt.Printf("Error reading standard input: %v\n", err)
+			os.Exit(1)
+		}
+		html = builder.String()
+	} else {
+		fmt.Println("Usage: go run main.go [-w] [<file.html>]")
 		os.Exit(1)
 	}
-
-	filePath := flag.Args()[0]
-
-	// Read the HTML file
-	data, err := os.ReadFile(filePath)
-	if err != nil {
-		fmt.Printf("Error reading file: %v\n", err)
-		os.Exit(1)
-	}
-	html := string(data)
 
 	// Extract the <style> section
 	styleRegex := regexp.MustCompile(`(?s)<style.*?>(.*?)</style>`)
@@ -88,8 +104,9 @@ func main() {
 	}
 
 	// Output the modified HTML
-	if *write {
-		err = os.WriteFile(filePath, []byte(html), 0644)
+	if *write && len(flag.Args()) == 1 {
+		filePath := flag.Args()[0]
+		err := os.WriteFile(filePath, []byte(html), 0644)
 		if err != nil {
 			fmt.Printf("Error writing file: %v\n", err)
 			os.Exit(1)
