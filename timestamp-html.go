@@ -3,7 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
+	"io"
 	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 )
@@ -13,16 +15,25 @@ func main() {
 	writeFlag := flag.Bool("w", false, "Overwrite the input file with the timestamped HTML")
 	flag.Parse()
 
-	// Get the input file name from the command line arguments
-	if len(flag.Args()) != 1 {
-		panic("Please provide the HTML file as an argument")
-	}
-	inputFile := flag.Args()[0]
+	var content []byte
+	var err error
 
-	// Read the input file
-	content, err := ioutil.ReadFile(inputFile)
-	if err != nil {
-		panic(err)
+	// Check if a filename is provided or read from standard input
+	if len(flag.Args()) == 1 {
+		// Read the input file
+		inputFile := flag.Args()[0]
+		content, err = ioutil.ReadFile(inputFile)
+		if err != nil {
+			panic(err)
+		}
+	} else if len(flag.Args()) == 0 {
+		// Read from standard input
+		content, err = io.ReadAll(os.Stdin)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		panic("Please provide at most one HTML file as an argument")
 	}
 
 	// Get the current timestamp in ISO 8601 format
@@ -38,17 +49,16 @@ func main() {
 	// Insert the timestamp after the </style> tag
 	timestampedHTML := html[:styleEndIndex+8] + timestamp + "<br>" + html[styleEndIndex+8:]
 
-	// Print the timestamp to standard output
-	fmt.Println("Timestamp inserted:", timestamp)
-
-	// If the -w flag is provided, overwrite the file
-	if *writeFlag {
+	// Handle output
+	if len(flag.Args()) == 1 && *writeFlag {
+		// Overwrite the file if -w flag is provided
+		inputFile := flag.Args()[0]
 		err = ioutil.WriteFile(inputFile, []byte(timestampedHTML), 0644)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		// Otherwise, print the updated HTML to standard output
-		fmt.Println(timestampedHTML)
+		// Print the updated HTML to standard output
+		fmt.Print(timestampedHTML)
 	}
 }
