@@ -38,7 +38,6 @@ func main() {
 		html = string(data)
 	} else if len(flag.Args()) == 0 {
 		// Read HTML content from standard input
-		fmt.Println("Reading from standard input (end input with EOF)...")
 		scanner := bufio.NewScanner(os.Stdin)
 		var builder strings.Builder
 		for scanner.Scan() {
