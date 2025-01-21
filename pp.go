@@ -38,14 +38,15 @@ func (p *Preprocessor) ProcessFile(filename string) string {
 	var result strings.Builder
 	scanner := bufio.NewScanner(file)
 	for scanner.Scan() {
-		line := strings.TrimSpace(scanner.Text())
+		originalLine := scanner.Text()
+		trimmedLine := strings.TrimSpace(originalLine)
 
-		if defineMatch := definePattern.FindStringSubmatch(line); defineMatch != nil {
+		if defineMatch := definePattern.FindStringSubmatch(trimmedLine); defineMatch != nil {
 			// Handle #define
 			key := defineMatch[1]
 			value := defineMatch[2]
 			p.defines[key] = value
-		} else if includeMatch := includePattern.FindStringSubmatch(line); includeMatch != nil {
+		} else if includeMatch := includePattern.FindStringSubmatch(trimmedLine); includeMatch != nil {
 			// Handle #include
 			includeFile := includeMatch[1]
 			if !isAbsolutePath(includeFile) {
@@ -54,11 +55,12 @@ func (p *Preprocessor) ProcessFile(filename string) string {
 			includedContent := p.ProcessFile(includeFile)
 			result.WriteString(includedContent)
 		} else {
-			// Replace defined symbols in the line
+			// Replace defined symbols in the original line
+			processedLine := originalLine
 			for key, value := range p.defines {
-				line = replaceSymbols(line, key, value)
+				processedLine = replaceSymbols(processedLine, key, value)
 			}
-			result.WriteString(line + "\n")
+			result.WriteString(processedLine + "\n")
 		}
 	}
 
