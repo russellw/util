@@ -1,13 +1,33 @@
 #include <iostream>
 #include <string>
 #include <windows.h>
+#include <sstream>
 
 void PrintUsage() {
-    std::cout << "Usage: ResizeWindow.exe <WindowTitle> <Width> <Height>" << std::endl;
+    std::cout << "Usage: ResizeWindow.exe <WindowTitle|ProcessID> <Width> <Height>" << std::endl;
 }
 
 HWND FindWindowByTitle(const std::string& title) {
     return FindWindowA(NULL, title.c_str());
+}
+
+HWND FindWindowByProcessID(DWORD processID) {
+    HWND hwnd = NULL;
+    do {
+        hwnd = FindWindowExA(NULL, hwnd, NULL, NULL);
+        DWORD pid = 0;
+        GetWindowThreadProcessId(hwnd, &pid);
+        if (pid == processID) {
+            return hwnd;
+        }
+    } while (hwnd != NULL);
+    return NULL;
+}
+
+bool IsInteger(const std::string& str) {
+    std::istringstream iss(str);
+    int num;
+    return (iss >> num) && (iss.eof());
 }
 
 int main(int argc, char* argv[]) {
@@ -16,14 +36,25 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    std::string windowTitle = argv[1];
+    std::string windowArg = argv[1];
     int width = std::stoi(argv[2]);
     int height = std::stoi(argv[3]);
 
-    HWND hwnd = FindWindowByTitle(windowTitle);
-    if (!hwnd) {
-        std::cerr << "Error: Could not find a window with title \"" << windowTitle << "\"" << std::endl;
-        return 1;
+    HWND hwnd = NULL;
+
+    if (IsInteger(windowArg)) {
+        DWORD processID = std::stoul(windowArg);
+        hwnd = FindWindowByProcessID(processID);
+        if (!hwnd) {
+            std::cerr << "Error: Could not find a window associated with process ID " << processID << std::endl;
+            return 1;
+        }
+    } else {
+        hwnd = FindWindowByTitle(windowArg);
+        if (!hwnd) {
+            std::cerr << "Error: Could not find a window with title \"" << windowArg << "\"" << std::endl;
+            return 1;
+        }
     }
 
     RECT rect;
