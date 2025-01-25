@@ -18,7 +18,10 @@ HWND FindWindowByProcessID(DWORD processID) {
         DWORD pid = 0;
         GetWindowThreadProcessId(hwnd, &pid);
         if (pid == processID) {
-            return hwnd;
+            char className[256];
+            if (IsWindowVisible(hwnd) && GetClassNameA(hwnd, className, sizeof(className))) {
+                return hwnd;
+            }
         }
     } while (hwnd != NULL);
     return NULL;
@@ -46,7 +49,7 @@ int main(int argc, char* argv[]) {
         DWORD processID = std::stoul(windowArg);
         hwnd = FindWindowByProcessID(processID);
         if (!hwnd) {
-            std::cerr << "Error: Could not find a window associated with process ID " << processID << std::endl;
+            std::cerr << "Error: Could not find a visible window associated with process ID " << processID << std::endl;
             return 1;
         }
     } else {
