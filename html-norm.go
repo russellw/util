@@ -13,10 +13,14 @@ import (
 var (
 	// Regex for finding heading tags and their content
 	headingRegex = regexp.MustCompile(`(<h[1-6]>)(.*?)(</h[1-6]>)`)
-	// Regex for finding </li> tags
-	liEndRegex = regexp.MustCompile(`</li>`)
+	// Regex for finding </li> tags, including the entire line if it's the only content
+	liEndRegex = regexp.MustCompile(`^\s*</li>\s*\n`)
 	// Regex for finding <strong> tags
 	strongRegex = regexp.MustCompile(`<strong(>|\s[^>]*>)`)
+	// Special words that should remain capitalized
+	specialWords = map[string]bool{
+		"english": true,
+	}
 )
 
 func main() {
@@ -78,10 +82,10 @@ func normalize(content string) string {
 	content = strongRegex.ReplaceAllString(content, "<b$1")
 	content = strings.ReplaceAll(content, "</strong>", "</b>")
 
-	// Remove </li> tags
+	// Remove lines containing only </li>
 	content = liEndRegex.ReplaceAllString(content, "")
 
-	// Convert heading text to sentence case
+	// Convert heading text to sentence case while preserving special words
 	content = headingRegex.ReplaceAllStringFunc(content, func(match string) string {
 		parts := headingRegex.FindStringSubmatch(match)
 		if len(parts) != 4 {
@@ -97,9 +101,15 @@ func normalize(content string) string {
 		if len(words) > 0 {
 			// Capitalize first word
 			words[0] = strings.Title(strings.ToLower(words[0]))
-			// Convert rest to lower case
+			// Convert rest to lower case, preserving special words
 			for i := 1; i < len(words); i++ {
-				words[i] = strings.ToLower(words[i])
+				word := words[i]
+				wordLower := strings.ToLower(word)
+				if specialWords[wordLower] {
+					words[i] = strings.Title(wordLower)
+				} else {
+					words[i] = wordLower
+				}
 			}
 			text = strings.Join(words, " ")
 		}
