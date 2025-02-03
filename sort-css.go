@@ -1,4 +1,3 @@
-// Sort CSS rules in alphabetical order
 package main
 
 import (
@@ -37,6 +36,7 @@ func readLines(path string) {
 		}
 		lines = append(lines, s)
 	}
+
 	if err := scanner.Err(); err != nil {
 		log.Fatal(err)
 	}
@@ -51,42 +51,68 @@ func parseRule(i *int) Rule {
 		s = strings.TrimSpace(s)
 		selectors = append(selectors, s)
 	}
+
 	if !strings.HasSuffix(lines[*i], "{") {
 		log.Fatal("syntax error")
 	}
+
 	s := lines[*i]
 	*i++
 	s = strings.TrimSuffix(s, "{")
 	s = strings.TrimSpace(s)
 	selectors = append(selectors, s)
+
 	rule := Rule{selectors: selectors}
 	for *i < len(lines) {
 		if lines[*i] == "}" {
 			*i++
 			break
 		}
+
 		if strings.HasSuffix(lines[*i], "{") || strings.HasSuffix(lines[*i], ",") {
 			rule.rules = append(rule.rules, parseRule(i))
 			continue
 		}
+
 		s := lines[*i]
 		*i++
 		rule.properties = append(rule.properties, s)
 	}
+
 	return rule
 }
 
 // customLess compares two strings with custom rules:
-// - Letters ('a'-'z', 'A'-'Z') come before '.' and '@'.
-// - '.' comes after letters but before '@'.
-// - '@' comes last.
+// - Special handling for media queries with (orientation) and (max-width)
+// - Letters ('a'-'z', 'A'-'Z') come before '.' and '@'
+// - '.' comes after letters but before '@'
+// - '@' comes last
 func customLess(a, b string) bool {
+	// Special handling for media queries
+	if strings.Contains(a, "@media") && strings.Contains(b, "@media") {
+		hasOrientation := func(s string) bool {
+			return strings.Contains(s, "(orientation")
+		}
+		hasMaxWidth := func(s string) bool {
+			return strings.Contains(s, "(max-width")
+		}
+
+		if hasOrientation(a) && hasMaxWidth(b) {
+			return true
+		}
+		if hasMaxWidth(a) && hasOrientation(b) {
+			return false
+		}
+	}
+
+	// Original character-by-character comparison
 	for i := 0; i < len(a) && i < len(b); i++ {
 		ra, rb := customRank(a[i]), customRank(b[i])
 		if ra != rb {
 			return ra < rb
 		}
 	}
+
 	return len(a) < len(b)
 }
 
@@ -126,7 +152,6 @@ func sortRules(rules []Rule) {
 // stringifyRules converts sorted rules back to a CSS string.
 func stringifyRules(rules []Rule, indent string) string {
 	var builder strings.Builder
-
 	for _, rule := range rules {
 		builder.WriteString(indent + strings.Join(rule.selectors, ", ") + " {\n")
 		for _, prop := range rule.properties {
@@ -135,7 +160,6 @@ func stringifyRules(rules []Rule, indent string) string {
 		builder.WriteString(stringifyRules(rule.rules, indent+"  "))
 		builder.WriteString(indent + "}\n")
 	}
-
 	return builder.String()
 }
 
@@ -158,6 +182,7 @@ func main() {
 	for i < len(lines) {
 		rules = append(rules, parseRule(&i))
 	}
+
 	sortRules(rules)
 	output := stringifyRules(rules, "")
 
