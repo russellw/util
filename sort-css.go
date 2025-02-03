@@ -1,3 +1,4 @@
+// Sort CSS rules in alphabetical order
 package main
 
 import (
