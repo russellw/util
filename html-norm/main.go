@@ -1,13 +1,22 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"io"
 	"os"
+	"regexp"
 	"strings"
+)
 
-	"golang.org/x/net/html"
+var (
+	// Regex for finding heading tags and their content
+	headingRegex = regexp.MustCompile(`(<h[1-6]>)(.*?)(</h[1-6]>)`)
+	// Regex for finding </li> tags
+	liEndRegex = regexp.MustCompile(`</li>`)
+	// Regex for finding <strong> tags
+	strongRegex = regexp.MustCompile(`<strong(>|\s[^>]*>)`)
 )
 
 func main() {
@@ -30,15 +39,15 @@ func main() {
 		input = os.Stdin
 	}
 
-	// Parse HTML
-	doc, err := html.Parse(input)
+	// Read entire input into memory
+	content, err := io.ReadAll(input)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to parse HTML: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to read input: %v\n", err)
 		os.Exit(1)
 	}
 
-	// Normalize the document
-	normalizeNode(doc)
+	// Normalize the content
+	normalized := normalize(string(content))
 
 	// Prepare output
 	var output io.Writer
@@ -55,55 +64,48 @@ func main() {
 	}
 
 	// Write the result
-	err = html.Render(output, doc)
+	writer := bufio.NewWriter(output)
+	_, err = writer.WriteString(normalized)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "Failed to render HTML: %v\n", err)
+		fmt.Fprintf(os.Stderr, "Failed to write output: %v\n", err)
 		os.Exit(1)
 	}
+	writer.Flush()
 }
 
-func normalizeNode(n *html.Node) {
-	if n.Type == html.ElementNode {
-		// Replace <strong> with <b>
-		if n.Data == "strong" {
-			n.Data = "b"
+func normalize(content string) string {
+	// Replace <strong> with <b>
+	content = strongRegex.ReplaceAllString(content, "<b$1")
+	content = strings.ReplaceAll(content, "</strong>", "</b>")
+
+	// Remove </li> tags
+	content = liEndRegex.ReplaceAllString(content, "")
+
+	// Convert heading text to sentence case
+	content = headingRegex.ReplaceAllStringFunc(content, func(match string) string {
+		parts := headingRegex.FindStringSubmatch(match)
+		if len(parts) != 4 {
+			return match
 		}
+		
+		openTag := parts[1]
+		text := parts[2]
+		closeTag := parts[3]
 
-		// Remove </li> by marking it as self-closing
-		if n.Data == "li" {
-			n.DataAtom = 0
-		}
-
-		// Convert heading text to sentence case
-		if isHeading(n.Data) {
-			normalizeHeadingText(n)
-		}
-	}
-
-	// Recursively process child nodes
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		normalizeNode(c)
-	}
-}
-
-func isHeading(tag string) bool {
-	return len(tag) == 2 && tag[0] == 'h' && tag[1] >= '1' && tag[1] <= '6'
-}
-
-func normalizeHeadingText(n *html.Node) {
-	for c := n.FirstChild; c != nil; c = c.NextSibling {
-		if c.Type == html.TextNode {
-			// Convert to sentence case
-			words := strings.Fields(c.Data)
-			if len(words) > 0 {
-				// Capitalize first word
-				words[0] = strings.Title(strings.ToLower(words[0]))
-				// Convert rest to lower case
-				for i := 1; i < len(words); i++ {
-					words[i] = strings.ToLower(words[i])
-				}
-				c.Data = strings.Join(words, " ")
+		// Convert text to sentence case
+		words := strings.Fields(text)
+		if len(words) > 0 {
+			// Capitalize first word
+			words[0] = strings.Title(strings.ToLower(words[0]))
+			// Convert rest to lower case
+			for i := 1; i < len(words); i++ {
+				words[i] = strings.ToLower(words[i])
 			}
+			text = strings.Join(words, " ")
 		}
-	}
+
+		return openTag + text + closeTag
+	})
+
+	return content
 }
