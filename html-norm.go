@@ -13,8 +13,10 @@ import (
 var (
 	// Regex for finding heading tags and their content
 	headingRegex = regexp.MustCompile(`(<h[1-6]>)(.*?)(</h[1-6]>)`)
-	// Regex for finding </li> tags, including the entire line if it's the only content
-	liEndRegex = regexp.MustCompile(`^\s*</li>\s*\n`)
+	// Regex for finding </li> tags on their own line (including whitespace)
+	liEndLineRegex = regexp.MustCompile(`(?m)^\s*</li>\s*$\n?`)
+	// Regex for finding </li> tags within other content
+	liEndRegex = regexp.MustCompile(`</li>`)
 	// Regex for finding <strong> tags
 	strongRegex = regexp.MustCompile(`<strong(>|\s[^>]*>)`)
 	// Special words that should remain capitalized
@@ -82,7 +84,9 @@ func normalize(content string) string {
 	content = strongRegex.ReplaceAllString(content, "<b$1")
 	content = strings.ReplaceAll(content, "</strong>", "</b>")
 
-	// Remove lines containing only </li>
+	// First remove lines containing only </li>
+	content = liEndLineRegex.ReplaceAllString(content, "")
+	// Then remove any remaining </li> tags that are inline with other content
 	content = liEndRegex.ReplaceAllString(content, "")
 
 	// Convert heading text to sentence case while preserving special words
