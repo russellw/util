@@ -143,7 +143,7 @@ func main() {
 	writeFlag := flag.Bool("w", false, "Overwrite the input file instead of printing")
 	flag.Parse()
 
-	filename := "styles.css"
+	filename := "style.css"
 	if flag.NArg() > 0 {
 		filename = flag.Arg(0)
 	}
