@@ -95,7 +95,7 @@ func normalize(content string) string {
 		if len(parts) != 4 {
 			return match
 		}
-		
+
 		openTag := parts[1]
 		text := parts[2]
 		closeTag := parts[3]
