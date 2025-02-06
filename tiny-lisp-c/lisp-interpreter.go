@@ -191,8 +191,40 @@ func (i *Interpreter) Eval(expr Value) (Value, error) {
 	}
 }
 
+func evalString(interpreter *Interpreter, input string) error {
+	lexer := NewLexer(input)
+	tokens := lexer.tokenize()
+	parser := NewParser(tokens)
+	
+	expr, err := parser.parse()
+	if err != nil {
+		return fmt.Errorf("Parse error: %v", err)
+	}
+	
+	result, err := interpreter.Eval(expr)
+	if err != nil {
+		return fmt.Errorf("Eval error: %v", err)
+	}
+	fmt.Println(result)
+	return nil
+}
+
 func main() {
 	interpreter := NewInterpreter()
+
+	if len(os.Args) > 1 {
+		content, err := os.ReadFile(os.Args[1])
+		if err != nil {
+			fmt.Printf("Error reading file: %v\n", err)
+			os.Exit(1)
+		}
+		if err := evalString(interpreter, string(content)); err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		return
+	}
+
 	scanner := bufio.NewScanner(os.Stdin)
 	fmt.Print("miniLisp> ")
 	
@@ -202,22 +234,8 @@ func main() {
 			break
 		}
 		
-		lexer := NewLexer(input)
-		tokens := lexer.tokenize()
-		parser := NewParser(tokens)
-		
-		expr, err := parser.parse()
-		if err != nil {
-			fmt.Printf("Parse error: %v\n", err)
-			fmt.Print("miniLisp> ")
-			continue
-		}
-		
-		result, err := interpreter.Eval(expr)
-		if err != nil {
-			fmt.Printf("Eval error: %v\n", err)
-		} else {
-			fmt.Println(result)
+		if err := evalString(interpreter, input); err != nil {
+			fmt.Println(err)
 		}
 		fmt.Print("miniLisp> ")
 	}
