@@ -1,0 +1,5 @@
+C:\util\tiny-lisp-c>tim lisp-interpreter.exe fibonacci.lisp
+Timer started: 2/6/2025 3:21:41 p.m.
+Function fib defined
+832040
+2.8 seconds
