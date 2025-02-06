@@ -311,29 +311,53 @@ func repl() {
 	}
 }
 
+func prettyPrint(expr Expr) string {
+    switch v := expr.(type) {
+    case Number:
+        return fmt.Sprintf("%g", float64(v))
+    case Symbol:
+        return string(v)
+    case List:
+        var parts []string
+        for _, e := range v {
+            parts = append(parts, prettyPrint(e))
+        }
+        return "(" + strings.Join(parts, " ") + ")"
+    case Function:
+        // Instead of printing a pointer, show a friendly message.
+        return "<function>"
+    default:
+        return fmt.Sprintf("%v", expr)
+    }
+}
+
 func main() {
-	if len(os.Args) > 1 {
-		// If a filename is provided as a command-line argument, execute the file.
-		data, err := os.ReadFile(os.Args[1])
-		if err != nil {
-			fmt.Println("Error reading file:", err)
-			return
-		}
-		env := standardEnv()
-		tokens := tokenize(string(data))
-		expr, _, err := parse(tokens)
-		if err != nil {
-			fmt.Println("Parse error:", err)
-			return
-		}
-		result, err := eval(expr, env)
-		if err != nil {
-			fmt.Println("Evaluation error:", err)
-			return
-		}
-		fmt.Println(result)
-	} else {
-		// Otherwise, start an interactive REPL.
-		repl()
-	}
+    env := standardEnv()
+    if len(os.Args) > 1 {
+        // Read the file.
+        data, err := os.ReadFile(os.Args[1])
+        if err != nil {
+            fmt.Println("Error reading file:", err)
+            return
+        }
+        tokens := tokenize(string(data))
+        var result Expr
+        // Parse and evaluate all top-level expressions.
+        for len(tokens) > 0 {
+            var expr Expr
+            expr, tokens, err = parse(tokens)
+            if err != nil {
+                fmt.Println("Parse error:", err)
+                return
+            }
+            result, err = eval(expr, env)
+            if err != nil {
+                fmt.Println("Evaluation error:", err)
+                return
+            }
+        }
+        fmt.Println(prettyPrint(result))
+    } else {
+        repl()
+    }
 }
