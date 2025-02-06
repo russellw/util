@@ -1,0 +1,224 @@
+package main
+
+import (
+	"bufio"
+	"fmt"
+	"os"
+	"strconv"
+	"strings"
+)
+
+type TokenType int
+
+const (
+	LPAREN TokenType = iota
+	RPAREN
+	SYMBOL
+	NUMBER
+	EOF
+)
+
+type Token struct {
+	Type  TokenType
+	Value string
+}
+
+type Lexer struct {
+	input  string
+	pos    int
+	tokens []Token
+}
+
+func NewLexer(input string) *Lexer {
+	return &Lexer{input: input, pos: 0}
+}
+
+func (l *Lexer) tokenize() []Token {
+	for l.pos < len(l.input) {
+		switch c := l.input[l.pos]; {
+		case c == '(':
+			l.tokens = append(l.tokens, Token{LPAREN, "("})
+			l.pos++
+		case c == ')':
+			l.tokens = append(l.tokens, Token{RPAREN, ")"})
+			l.pos++
+		case c == ' ' || c == '\t' || c == '\n':
+			l.pos++
+		default:
+			if isDigit(c) {
+				l.readNumber()
+			} else {
+				l.readSymbol()
+			}
+		}
+	}
+	l.tokens = append(l.tokens, Token{EOF, ""})
+	return l.tokens
+}
+
+func (l *Lexer) readNumber() {
+	start := l.pos
+	for l.pos < len(l.input) && isDigit(l.input[l.pos]) {
+		l.pos++
+	}
+	l.tokens = append(l.tokens, Token{NUMBER, l.input[start:l.pos]})
+}
+
+func (l *Lexer) readSymbol() {
+	start := l.pos
+	for l.pos < len(l.input) && !isDelimiter(l.input[l.pos]) {
+		l.pos++
+	}
+	l.tokens = append(l.tokens, Token{SYMBOL, l.input[start:l.pos]})
+}
+
+func isDigit(c byte) bool {
+	return c >= '0' && c <= '9'
+}
+
+func isDelimiter(c byte) bool {
+	return c == ' ' || c == '\t' || c == '\n' || c == '(' || c == ')'
+}
+
+type Value interface{}
+type Symbol string
+type List []Value
+
+type Parser struct {
+	tokens []Token
+	pos    int
+}
+
+func NewParser(tokens []Token) *Parser {
+	return &Parser{tokens: tokens}
+}
+
+func (p *Parser) parse() (Value, error) {
+	token := p.tokens[p.pos]
+	switch token.Type {
+	case LPAREN:
+		p.pos++
+		list := List{}
+		for p.tokens[p.pos].Type != RPAREN {
+			if p.tokens[p.pos].Type == EOF {
+				return nil, fmt.Errorf("unexpected EOF")
+			}
+			val, err := p.parse()
+			if err != nil {
+				return nil, err
+			}
+			list = append(list, val)
+		}
+		p.pos++ // consume RPAREN
+		return list, nil
+	case NUMBER:
+		p.pos++
+		n, _ := strconv.Atoi(token.Value)
+		return n, nil
+	case SYMBOL:
+		p.pos++
+		return Symbol(token.Value), nil
+	default:
+		return nil, fmt.Errorf("unexpected token: %v", token)
+	}
+}
+
+type Environment map[Symbol]Value
+
+func NewEnvironment() Environment {
+	env := Environment{}
+	env["+"] = func(args ...int) int {
+		result := 0
+		for _, arg := range args {
+			result += arg
+		}
+		return result
+	}
+	env["-"] = func(args ...int) int {
+		if len(args) == 0 {
+			return 0
+		}
+		result := args[0]
+		for _, arg := range args[1:] {
+			result -= arg
+		}
+		return result
+	}
+	return env
+}
+
+type Interpreter struct {
+	env Environment
+}
+
+func NewInterpreter() *Interpreter {
+	return &Interpreter{env: NewEnvironment()}
+}
+
+func (i *Interpreter) Eval(expr Value) (Value, error) {
+	switch v := expr.(type) {
+	case int:
+		return v, nil
+	case Symbol:
+		if val, ok := i.env[v]; ok {
+			return val, nil
+		}
+		return nil, fmt.Errorf("undefined symbol: %v", v)
+	case List:
+		if len(v) == 0 {
+			return nil, nil
+		}
+		fn, err := i.Eval(v[0])
+		if err != nil {
+			return nil, err
+		}
+		switch fn := fn.(type) {
+		case func(...int) int:
+			args := make([]int, 0, len(v)-1)
+			for _, arg := range v[1:] {
+				evaledArg, err := i.Eval(arg)
+				if err != nil {
+					return nil, err
+				}
+				args = append(args, evaledArg.(int))
+			}
+			return fn(args...), nil
+		default:
+			return nil, fmt.Errorf("not a function: %v", fn)
+		}
+	default:
+		return nil, fmt.Errorf("unknown expression type: %T", expr)
+	}
+}
+
+func main() {
+	interpreter := NewInterpreter()
+	scanner := bufio.NewScanner(os.Stdin)
+	fmt.Print("miniLisp> ")
+	
+	for scanner.Scan() {
+		input := scanner.Text()
+		if input == "quit" {
+			break
+		}
+		
+		lexer := NewLexer(input)
+		tokens := lexer.tokenize()
+		parser := NewParser(tokens)
+		
+		expr, err := parser.parse()
+		if err != nil {
+			fmt.Printf("Parse error: %v\n", err)
+			fmt.Print("miniLisp> ")
+			continue
+		}
+		
+		result, err := interpreter.Eval(expr)
+		if err != nil {
+			fmt.Printf("Eval error: %v\n", err)
+		} else {
+			fmt.Println(result)
+		}
+		fmt.Print("miniLisp> ")
+	}
+}
