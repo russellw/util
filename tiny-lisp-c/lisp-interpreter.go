@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-
 )
 
 type TokenType int
@@ -83,6 +82,7 @@ func isDelimiter(c byte) bool {
 type Value interface{}
 type Symbol string
 type List []Value
+type Function func([]Value) (Value, error)
 
 type Parser struct {
 	tokens []Token
@@ -123,37 +123,97 @@ func (p *Parser) parse() (Value, error) {
 	}
 }
 
-type Environment map[Symbol]Value
+type Environment map[Symbol]Function
 
 func NewEnvironment() Environment {
 	env := Environment{}
-	env["+"] = func(args ...int) int {
+	
+	env["+"] = func(args []Value) (Value, error) {
 		result := 0
 		for _, arg := range args {
-			result += arg
+			n, ok := arg.(int)
+			if !ok {
+				return nil, fmt.Errorf("'+' requires numbers")
+			}
+			result += n
 		}
-		return result
+		return result, nil
 	}
-	env["-"] = func(args ...int) int {
+
+	env["*"] = func(args []Value) (Value, error) {
+		result := 1
+		for _, arg := range args {
+			n, ok := arg.(int)
+			if !ok {
+				return nil, fmt.Errorf("'*' requires numbers")
+			}
+			result *= n
+		}
+		return result, nil
+	}
+
+	env["-"] = func(args []Value) (Value, error) {
 		if len(args) == 0 {
-			return 0
+			return 0, nil
 		}
-		result := args[0]
+		first, ok := args[0].(int)
+		if !ok {
+			return nil, fmt.Errorf("'-' requires numbers")
+		}
+		result := first
 		for _, arg := range args[1:] {
-			result -= arg
+			n, ok := arg.(int)
+			if !ok {
+				return nil, fmt.Errorf("'-' requires numbers")
+			}
+			result -= n
 		}
-		return result
+		return result, nil
 	}
-	env["*"] = func(args ...int) int {
-		if len(args) == 0 {
-			return 1
-		}
-		result := args[0]
-		for _, arg := range args[1:] {
-			result *= arg
-		}
-		return result
+
+	env["list"] = func(args []Value) (Value, error) {
+		return List(args), nil
 	}
+
+	env["car"] = func(args []Value) (Value, error) {
+		if len(args) != 1 {
+			return nil, fmt.Errorf("car takes exactly one argument")
+		}
+		list, ok := args[0].(List)
+		if !ok {
+			return nil, fmt.Errorf("car requires a list")
+		}
+		if len(list) == 0 {
+			return nil, fmt.Errorf("car: empty list")
+		}
+		return list[0], nil
+	}
+
+	env["cdr"] = func(args []Value) (Value, error) {
+		if len(args) != 1 {
+			return nil, fmt.Errorf("cdr takes exactly one argument")
+		}
+		list, ok := args[0].(List)
+		if !ok {
+			return nil, fmt.Errorf("cdr requires a list")
+		}
+		if len(list) <= 1 {
+			return List{}, nil
+		}
+		return list[1:], nil
+	}
+
+	env["cons"] = func(args []Value) (Value, error) {
+		if len(args) != 2 {
+			return nil, fmt.Errorf("cons takes exactly two arguments")
+		}
+		list, ok := args[1].(List)
+		if !ok {
+			return nil, fmt.Errorf("cons requires a list as second argument")
+		}
+		return append(List{args[0]}, list...), nil
+	}
+
 	return env
 }
 
@@ -170,8 +230,8 @@ func (i *Interpreter) Eval(expr Value) (Value, error) {
 	case int:
 		return v, nil
 	case Symbol:
-		if val, ok := i.env[v]; ok {
-			return val, nil
+		if fn, ok := i.env[v]; ok {
+			return fn, nil
 		}
 		return nil, fmt.Errorf("undefined symbol: %v", v)
 	case List:
@@ -182,20 +242,19 @@ func (i *Interpreter) Eval(expr Value) (Value, error) {
 		if err != nil {
 			return nil, err
 		}
-		switch fn := fn.(type) {
-		case func(...int) int:
-			args := make([]int, 0, len(v)-1)
-			for _, arg := range v[1:] {
-				evaledArg, err := i.Eval(arg)
-				if err != nil {
-					return nil, err
-				}
-				args = append(args, evaledArg.(int))
-			}
-			return fn(args...), nil
-		default:
-			return nil, fmt.Errorf("not a function: %v", fn)
+		f, ok := fn.(Function)
+		if !ok {
+			return nil, fmt.Errorf("not a function")
 		}
+		args := make([]Value, 0, len(v)-1)
+		for _, arg := range v[1:] {
+			evaledArg, err := i.Eval(arg)
+			if err != nil {
+				return nil, err
+			}
+			args = append(args, evaledArg)
+		}
+		return f(args)
 	default:
 		return nil, fmt.Errorf("unknown expression type: %T", expr)
 	}
