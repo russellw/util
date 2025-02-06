@@ -8,3 +8,8 @@ C:\Program Files\JetBrains\IntelliJ IDEA Community Edition 2024.3.2.2\jbr\bin>ja
 openjdk 21.0.5 2024-10-15
 OpenJDK Runtime Environment JBR-21.0.5+8-631.30-jcef (build 21.0.5+8-b631.30)
 OpenJDK 64-Bit Server VM JBR-21.0.5+8-631.30-jcef (build 21.0.5+8-b631.30, mixed mode, sharing)
+
+kotlinc src/Main.kt -d out/
+kotlin -cp out/ MainKt
+
+\kotlin-native-prebuilt-windows-x86_64-2.1.10\bin\kotlinc-native src/Main.kt
