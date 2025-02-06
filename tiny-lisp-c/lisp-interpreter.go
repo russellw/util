@@ -324,16 +324,20 @@ func evalString(interpreter *Environment, input string) error {
 	tokens := lexer.tokenize()
 	parser := NewParser(tokens)
 
-	expr, err := parser.parse()
-	if err != nil {
-		return fmt.Errorf("Parse error: %v", err)
-	}
+	for parser.pos < len(parser.tokens)-1 {  // -1 to skip final EOF
+		expr, err := parser.parse()
+		if err != nil {
+			return fmt.Errorf("Parse error: %v", err)
+		}
 
-	result, err := interpreter.Eval(expr)
-	if err != nil {
-		return fmt.Errorf("Eval error: %v", err)
+		result, err := interpreter.Eval(expr)
+		if err != nil {
+			return fmt.Errorf("Eval error: %v", err)
+		}
+		if result != nil {
+			fmt.Println(result)
+		}
 	}
-	fmt.Println(result)
 	return nil
 }
 
