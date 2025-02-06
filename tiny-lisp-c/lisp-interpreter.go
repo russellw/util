@@ -144,6 +144,16 @@ func NewEnvironment() Environment {
 		}
 		return result
 	}
+	env["*"] = func(args ...int) int {
+		if len(args) == 0 {
+			return 1
+		}
+		result := args[0]
+		for _, arg := range args[1:] {
+			result *= arg
+		}
+		return result
+	}
 	return env
 }
 
