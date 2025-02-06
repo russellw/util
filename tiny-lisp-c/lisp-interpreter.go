@@ -272,7 +272,7 @@ func NewEnvironment() *Environment {
 		})
 
 		env.vars[name] = fn
-		return fn, nil
+		return fmt.Sprintf("Function %s defined", name), nil
 	})
 
 	return env
