@@ -1,1 +1,1 @@
-clang++ mp.cpp -I/boost -std=c++17 
+clang++ mp.cpp -I/boost
