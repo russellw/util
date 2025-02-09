@@ -25,18 +25,18 @@ else:
 declare i32 @printf(i8* nocapture readonly, ...)
 
 ; String constant for output
-@.str = private unnamed_addr constant [19 x i8] c"Result value: %d\0A\00", align 1
+@.str = private unnamed_addr constant [18 x i8] c"Result value: %d\0A\00", align 1
 
 ; Main function to test our forward_refs function
 define i32 @main() {
 entry:
   ; Test with condition = true
   %result1 = call i32 @test_forward_refs(i1 1)
-  call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([19 x i8], [19 x i8]* @.str, i64 0, i64 0), i32 %result1)
+  call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([18 x i8], [18 x i8]* @.str, i64 0, i64 0), i32 %result1)
   
   ; Test with condition = false
   %result2 = call i32 @test_forward_refs(i1 0)
-  call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([19 x i8], [19 x i8]* @.str, i64 0, i64 0), i32 %result2)
+  call i32 (i8*, ...) @printf(i8* getelementptr inbounds ([18 x i8], [18 x i8]* @.str, i64 0, i64 0), i32 %result2)
   
   ret i32 0
 }
