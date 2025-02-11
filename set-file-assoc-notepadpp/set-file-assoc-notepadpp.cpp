@@ -1,6 +1,9 @@
 #include <windows.h>
 #include <iostream>
 #include <string>
+#include <shlobj.h>     // For SHChangeNotify
+#include <shellapi.h>   // For shell functions
+#pragma comment(lib, "shell32.lib")   // Link with shell32.lib
 
 bool setFileAssociation(const std::string& extension) {
     // Remove the dot if present at the start of extension
