@@ -24,7 +24,7 @@ union DataConverter {
 typedef int (*Operation)(int, int);
 
 // Inline function to demonstrate function inlining
-static inline int max(int a, int b) {
+static inline int max1(int a, int b) {
     return (a > b) ? a : b;
 }
 
