@@ -1,2 +1,2 @@
-clang-format -i --style=file *.c||exit /b
+clang-format -i --style=file *.cpp||exit /b
 git diff

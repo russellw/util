@@ -1,9 +1,9 @@
-enum  Color{
-Red,
-Green,
-Blue,
+enum Color {
+	Red,
+	Green,
+	Blue,
 };
 
-enum  Mood{
-Blue,
+enum Mood {
+	Blue,
 };
