@@ -24,8 +24,9 @@ public:
 // Implementation of operator<< (must be outside the class)
 std::ostream& operator<<(std::ostream& os, const Complex& c) {
 	os << c.real;
-	if (c.imag >= 0)
+	if (c.imag >= 0) {
 		os << "+";
+	}
 	os << c.imag << "i";
 	return os;
 }
