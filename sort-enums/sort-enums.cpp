@@ -158,11 +158,12 @@ int main(int argc, char* argv[]) {
                     outLines.push_back(h);
 
                 // Then, output the sorted items.
-                // When an item has associated comments, we insert a blank line before the first comment
-                // (unless one was just output) and a blank line after the item.
+                // For items with associated comments, we insert a blank line before the comment block
+                // if it isn’t the first sorted item and if the last output line isn’t already blank.
+                bool firstSortedItem = true;
                 for (const auto &item : items) {
                     if (!item.comments.empty()) {
-                        if (outLines.empty() || outLines.back() != "")
+                        if (!firstSortedItem && (outLines.empty() || outLines.back() != ""))
                             outLines.push_back(""); // blank line before comment block
                         for (const auto &cmt : item.comments)
                             outLines.push_back(cmt);
@@ -171,6 +172,7 @@ int main(int argc, char* argv[]) {
                     } else {
                         outLines.push_back(item.itemLine);
                     }
+                    firstSortedItem = false;
                 }
 
                 // Finally, output the footer lines.
