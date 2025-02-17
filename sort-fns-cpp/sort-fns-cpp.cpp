@@ -58,14 +58,19 @@ struct FunctionBlock {
 
 // --- Main program ---
 
-// The program scans each file for a marker line that (after trimming) is "// SORT FUNCTIONS".
-// The sorted section is assumed to start immediately after that line and continue until the first
+// The program scans each file for a marker line (after trimming) equal to "// SORT FUNCTIONS".
+// The sorted section starts immediately after the marker and continues until the first
 // nonblank line whose indent is less than that of the marker.
-// Within that section, each function block is assumed to start at a line with the same indentation
-// as the marker. Any immediately preceding comment lines (also at that indentation) are attached.
-// A function block ends when a line is encountered that is (after trimming) exactly "}" and has the same indent.
-// Functions are sorted by name (and, in case of overloads, by the complete signature line).
-// Finally, the section is rebuilt so that each function block is preceded by exactly one blank line.
+// Within that section, a function block is defined as follows:
+//  - Lines at base indent that start with "//" are considered attached comments.
+//  - A function block begins with a non-comment line at base indent (the signature line),
+//    along with any immediately preceding comment lines.
+//  - The function block is assumed to end when a line at base indent is encountered whose
+//    trimmed content is exactly "}".
+// After sorting the function blocks (by function name, and by signature for ties), the sorted
+// section is reassembled so that each block is preceded by exactly one blank line.
+// Finally, if the line that ended the sorted section (if any) does not start (after removing tabs)
+// with a '}', we add an extra blank line after the sorted section.
 int main(int argc, char* argv[]) {
     bool writeMode = false;
     vector<string> filenames;
@@ -146,13 +151,13 @@ int main(int argc, char* argv[]) {
         }
         
         // --- Parse function definitions from the sorted section using indentation ---
-        // We use a state machine to group lines:
-        // - Lines with the same indent as the marker are candidates for the start of a function block.
-        // - Any immediately preceding comment lines (starting with "//") at that indent are attached.
-        // - A function block ends when we see a line with baseIndent whose trimmed content is "}".
+        // Use a simple state machine:
+        //  - Pending comment lines at base indent are stored.
+        //  - When a non-comment line at base indent is encountered, a function block begins (attaching pending comments).
+        //  - The block continues until a line at base indent with trimmed content "}" is encountered.
         vector<FunctionBlock> blocks;
-        vector<string> pending;      // temporarily holds attached comments.
-        vector<string> currentBlock; // holds lines of the current function block.
+        vector<string> pending;      // holds attached comment lines
+        vector<string> currentBlock; // holds lines of the current function block
         bool inBlock = false;
         
         for (size_t idx = 0; idx < sortedSection.size(); idx++) {
@@ -162,7 +167,7 @@ int main(int argc, char* argv[]) {
             // Handle blank lines.
             if (trimmedLine.empty()) {
                 if (!inBlock)
-                    pending.clear(); // blank line resets any pending attached comments.
+                    pending.clear(); // reset pending comments on blank line
                 else
                     currentBlock.push_back(line);
                 continue;
@@ -173,20 +178,17 @@ int main(int argc, char* argv[]) {
             if (!inBlock) {
                 // Not currently in a function block.
                 if (indent == baseIndent) {
-                    // At base indent.
                     if (trimmedLine.rfind("//", 0) == 0) {
                         // It's a comment line; add to pending.
                         pending.push_back(line);
                     } else {
                         // This is the function signature.
-                        currentBlock = pending;  // attach any preceding comments.
+                        currentBlock = pending;  // attach any preceding comments
                         pending.clear();
                         currentBlock.push_back(line);
                         inBlock = true;
                     }
-                } else {
-                    // Line not at base indent and not in block: skip it.
-                }
+                } // else: ignore lines not at base indent.
             } else {
                 // We are inside a function block; add the line.
                 currentBlock.push_back(line);
@@ -236,16 +238,31 @@ int main(int argc, char* argv[]) {
                 newSortedSection.push_back(l);
         }
         
+        // --- Check the line that ended the sorted section ---
+        // If sortedEnd is not the end of the file, dedent the line and check whether its first character is '}'
+        bool needExtraBlank = false;
+        if (sortedEnd < (int)lines.size()) {
+            string dedented = lines[sortedEnd];
+            while (!dedented.empty() && dedented[0] == '\t')
+                dedented.erase(0, 1);
+            if (dedented.empty() || dedented[0] != '}') {
+                needExtraBlank = true;
+            }
+        }
+        
         // --- Reassemble the file ---
         // The new file consists of:
         // 1. Everything up to (and including) the marker.
         // 2. The new sorted section.
-        // 3. The remainder of the file.
+        // 3. Optionally, an extra blank line (if needed).
+        // 4. The remainder of the file.
         vector<string> finalLines;
         for (int i = 0; i < sortedStart; i++)
             finalLines.push_back(lines[i]);
         for (auto &l : newSortedSection)
             finalLines.push_back(l);
+        if (needExtraBlank)
+            finalLines.push_back(""); // extra blank line added here
         for (int i = sortedEnd; i < (int)lines.size(); i++)
             finalLines.push_back(lines[i]);
         
