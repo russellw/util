@@ -284,7 +284,7 @@ int main(int argc, char* argv[]) {
                 cout << newContent;
         } else {
             if (writeMode) {
-                ofstream ofs(filename);
+                ofstream ofs(filename, ios::binary);
                 if (!ofs)
                     cerr << "Error writing to file: " << filename << "\n";
                 else {

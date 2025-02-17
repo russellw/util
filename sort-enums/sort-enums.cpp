@@ -205,7 +205,7 @@ int main(int argc, char* argv[]) {
 
         if (writeInPlace) {
             // Overwrite the input file.
-            ofstream out(filename);
+            ofstream out(filename, ios::binary);
             if (!out) {
                 cerr << "Could not write file " << filename << "\n";
                 continue;

@@ -154,7 +154,7 @@ int main(int argc, char *argv[]) {
         // If -w was given, overwrite the file only if changes were made.
         if(writeBack) {
             if(changed) {
-                ofstream outFile(filename);
+                ofstream outFile(filename, ios::binary);
                 if(!outFile) {
                     cerr << "Error: could not write file " << filename << endl;
                     continue;
