@@ -65,6 +65,12 @@ int main(int argc, char* argv[]) {
         }
         in.close();
 
+        // Create a normalized version of the original file.
+        ostringstream origStream;
+        for (const auto &line : lines)
+            origStream << line << "\n";
+        string origNormalized = origStream.str();
+
         vector<string> outLines;
         size_t i = 0;
         while (i < lines.size()) {
@@ -190,6 +196,12 @@ int main(int argc, char* argv[]) {
         for (const auto &ol : outLines)
             oss << ol << "\n";
         string output = oss.str();
+
+        // If the output is identical to the original and -w was specified, do not rewrite.
+        if (writeInPlace && output == origNormalized) {
+            // No changes detected; skip rewriting.
+            continue;
+        }
 
         if (writeInPlace) {
             // Overwrite the input file.
