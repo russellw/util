@@ -56,7 +56,7 @@ int main(int argc, char *argv[]) {
         {
             string line;
             while(getline(inFile, line)) {
-                // Normalize: if line ends with '\r' remove it.
+                // Normalize: if line ends with '\r', remove it.
                 if (!line.empty() && line.back() == '\r')
                     line.pop_back();
                 originalLines.push_back(line);
@@ -77,53 +77,54 @@ int main(int argc, char *argv[]) {
                 int markerIndent = countLeadingTabs(line);
                 ++i; // move to the next line
 
-                // We'll accumulate the lines inside the sort region until "// END" is found.
-                // In that region, we expect several blocks.
+                // Accumulate the lines inside the sort region until "// END" is found.
+                // We will collect blocks and any stray lines.
                 vector< vector<string> > blocks;
-                // Instead of assuming the region contains only blocks, we collect
-                // any stray lines (that do not look like block headers) into "otherLines".
                 vector<string> otherLines;
 
-                // Process until we hit the "// END" marker.
                 while(i < originalLines.size() &&
                       originalLines[i].find("// END") == string::npos) {
-                    // A block is expected to start with a line that is at the same indent
-                    // as the marker (i.e. countLeadingTabs equals markerIndent) and its
-                    // first non-tab character is not '}'.
+                    // A block is expected to start with a line that is at the same indent as the marker
+                    // and whose first non-tab character is not '}'.
                     if(countLeadingTabs(originalLines[i]) == markerIndent &&
                        !trimLeadingTabs(originalLines[i]).empty() &&
                        trimLeadingTabs(originalLines[i])[0] != '}') {
                         vector<string> block;
-                        // The block header line.
+                        // The block header.
                         block.push_back(originalLines[i]);
                         ++i;
-                        // Read until we hit the block's closing brace: a line at the same indent
-                        // level whose first non-tab character is '}'.
+                        // Read until we hit the block's closing brace: a line at the same indent level
+                        // whose first non-tab character is '}'.
                         while(i < originalLines.size()) {
-                            block.push_back(originalLines[i]);
-                            string trimmed = trimLeadingTabs(originalLines[i]);
-                            if(!trimmed.empty() && trimmed[0] == '}') {
-                                ++i;
-                                break;
+                            // If this line is at the marker indent, it might be the block's closing brace.
+                            if(countLeadingTabs(originalLines[i]) == markerIndent) {
+                                string trimmed = trimLeadingTabs(originalLines[i]);
+                                if(!trimmed.empty() && trimmed[0] == '}') {
+                                    // Add the closing brace and end this block.
+                                    block.push_back(originalLines[i]);
+                                    ++i;
+                                    break;
+                                }
                             }
+                            // Otherwise, add the line as part of the block.
+                            block.push_back(originalLines[i]);
                             ++i;
                         }
                         blocks.push_back(block);
                     } else {
-                        // Not a block header? Add the line to "otherLines" unchanged.
+                        // Line is not recognized as a block header; add it verbatim.
                         otherLines.push_back(originalLines[i]);
                         ++i;
                     }
-                }
+                } // end while (inside sort region)
 
-                // Now, i should point to the "// END" marker (or end-of-file).
                 // First, output any stray lines that were not part of a block.
                 for (const auto &ol : otherLines)
                     newLines.push_back(ol);
 
-                // Sort the blocks alphabetically by their first line (ignoring leading tabs).
+                // Sort the blocks alphabetically by their header (ignoring leading tabs).
                 sort(blocks.begin(), blocks.end(),
-                     [markerIndent](const vector<string>& a, const vector<string>& b) {
+                     [](const vector<string>& a, const vector<string>& b) {
                          string aHeader = a.empty() ? "" : trimLeadingTabs(a[0]);
                          string bHeader = b.empty() ? "" : trimLeadingTabs(b[0]);
                          return aHeader < bHeader;
@@ -135,7 +136,7 @@ int main(int argc, char *argv[]) {
                         newLines.push_back(bline);
                 }
 
-                // Now, output the "// END" marker (if present).
+                // Now, output the "// END" marker if present.
                 if(i < originalLines.size()) {
                     newLines.push_back(originalLines[i]); // this is the "// END" line
                     ++i;
