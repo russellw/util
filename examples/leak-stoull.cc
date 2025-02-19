@@ -13,6 +13,6 @@
 using std::string;
 
 int main() {
-    size_t x = stoull(string("123"));
+    size_t x = stoull(string("123a"));
     return 0;
 }
