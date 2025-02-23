@@ -34,3 +34,4 @@ target/
 
 *.obj
 *.ll
+*.pdb

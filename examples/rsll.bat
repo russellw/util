@@ -1,0 +1,1 @@
+rustc --emit=llvm-ir %*
