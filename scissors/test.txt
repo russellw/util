@@ -1,0 +1,6 @@
+first line
+second line
+--foo.txt
+third line
+fourth line
+--bar.txt
