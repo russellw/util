@@ -1,19 +1,5 @@
-; ModuleID = 'C:\olivine\integration-tests\hello\hello.c'
-source_filename = "C:\\olivine\\integration-tests\\hello\\hello.c"
 target datalayout = "e-m:w-p270:32:32-p271:32:32-p272:64:64-i64:64-i128:128-f80:128-n8:16:32:64-S128"
 target triple = "x86_64-pc-windows-msvc19.40.33808"
-
-$sprintf = comdat any
-
-$vsprintf = comdat any
-
-$_snprintf = comdat any
-
-$_vsnprintf = comdat any
-
-$_vsprintf_l = comdat any
-
-$_vsnprintf_l = comdat any
 
 $__local_stdio_printf_options = comdat any
 
