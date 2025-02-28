@@ -30,45 +30,6 @@ declare void @llvm.va_start.p0(ptr) #2
 ; Function Attrs: nocallback nofree nosync nounwind willreturn
 declare void @llvm.va_end.p0(ptr) #2
 
-; Function Attrs: noinline nounwind optnone uwtable
-define linkonce_odr dso_local i32 @_vsnprintf_l(ptr noundef %0, i64 noundef %1, ptr noundef %2, ptr noundef %3, ptr noundef %4) #0 comdat {
-  %6 = alloca ptr, align 8
-  %7 = alloca ptr, align 8
-  %8 = alloca ptr, align 8
-  %9 = alloca i64, align 8
-  %10 = alloca ptr, align 8
-  %11 = alloca i32, align 4
-  store ptr %4, ptr %6, align 8
-  store ptr %3, ptr %7, align 8
-  store ptr %2, ptr %8, align 8
-  store i64 %1, ptr %9, align 8
-  store ptr %0, ptr %10, align 8
-  %12 = load ptr, ptr %6, align 8
-  %13 = load ptr, ptr %7, align 8
-  %14 = load ptr, ptr %8, align 8
-  %15 = load i64, ptr %9, align 8
-  %16 = load ptr, ptr %10, align 8
-  %17 = call ptr @__local_stdio_printf_options()
-  %18 = load i64, ptr %17, align 8
-  %19 = or i64 %18, 1
-  %20 = call i32 @__stdio_common_vsprintf(i64 noundef %19, ptr noundef %16, i64 noundef %15, ptr noundef %14, ptr noundef %13, ptr noundef %12)
-  store i32 %20, ptr %11, align 4
-  %21 = load i32, ptr %11, align 4
-  %22 = icmp slt i32 %21, 0
-  br i1 %22, label %23, label %24
-
-23:                                               ; preds = %5
-  br label %26
-
-24:                                               ; preds = %5
-  %25 = load i32, ptr %11, align 4
-  br label %26
-
-26:                                               ; preds = %24, %23
-  %27 = phi i32 [ -1, %23 ], [ %25, %24 ]
-  ret i32 %27
-}
-
 declare dso_local i32 @__stdio_common_vsprintf(i64 noundef, ptr noundef, i64 noundef, ptr noundef, ptr noundef, ptr noundef) #1
 
 ; Function Attrs: noinline nounwind optnone uwtable
