@@ -157,13 +157,11 @@ int main(int argc, char* argv[]) {
 				}
 				outFile << sortedContent;
 				outFile.close();
-				std::cout << "Updated file: " << filename << "\n";
+				std::cout << filename << "\n";
 			} else if (!writeToFile) {
 				// Print to stdout
 				std::cout << sortedContent;
-			} else {
-				std::cout << "No changes needed for file: " << filename << "\n";
-			}
+			} 
 		} catch (const std::exception& e) {
 			std::cerr << "Error processing file " << filename << ": " << e.what() << "\n";
 		}
