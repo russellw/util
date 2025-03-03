@@ -148,6 +148,7 @@ struct Case {
 void sortSwitch(int i) {
 	ASSERT(isSwitch(i));
 	i++;
+	auto i0 = i;
 	vector<Case*> cases;
 	while (isCase(i)) {
 		j = parseCase(i);
@@ -157,7 +158,16 @@ void sortSwitch(int i) {
 	}
 	ASSERT(indent(i) == dent);
 	ASSERT(lines[i].substr(dent) == "}");
+
 	std::sort(cases.begin(), cases.end(), [](const Case* a, const Case* b) { return a->v[0] < b->v[0]; });
+
+	i = i0;
+	for (auto c : cases) {
+		std::copy(c->v.begin(), c->v.end(), lines.begin() + i);
+		i += c->v.size();
+	}
+	ASSERT(indent(i) == dent);
+	ASSERT(lines[i].substr(dent) == "}");
 }
 
 void sortLines() {
