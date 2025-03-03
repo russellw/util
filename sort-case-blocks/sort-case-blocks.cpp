@@ -1,18 +1,66 @@
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <vector>
 #include <algorithm>
-#include <stdexcept>
+#include <fstream>
+#include <iostream>
+#include <limits>
+#include <memory>
+#include <set>
 #include <sstream>
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+#include <unordered_map>
+#include <unordered_set>
+#include <utility>
+#include <vector>
+using std::cerr;
+using std::cout;
+using std::hash;
+using std::ostream;
+using std::pair;
+using std::runtime_error;
+using std::string;
+using std::unordered_map;
+using std::unordered_set;
+using std::vector;
+
+// Helper function to create detailed error messages
+namespace message_detail {
+template <typename T> string toString(const T& val) {
+	std::ostringstream oss;
+	oss << val;
+	return oss.str();
+}
+
+inline string makeAssertMessage(const char* expression, const char* file, int line, const string& message = "") {
+	std::ostringstream oss;
+	oss << "Assertion failed: " << expression << "\nFile: " << file << "\nLine: " << line;
+
+	if (!message.empty()) {
+		oss << "\nMessage: " << message;
+	}
+
+	return oss.str();
+}
+} // namespace message_detail
+
+// Basic assertion that throws std::runtime_error
+#define ASSERT(condition)                                                                                                          \
+	do {                                                                                                                           \
+		if (!(condition)) {                                                                                                        \
+			throw runtime_error(message_detail::makeAssertMessage(#condition, __FILE__, __LINE__));                                \
+		}                                                                                                                          \
+	} while (0)
 
 #define dbg(a) std::cout << __FILE__ << ':' << __LINE__ << ": " << (a) << '\n'
 
-// Structure to represent a case block
-struct CaseBlock {
-    std::vector<std::string> lines;
-    std::string sortKey;
-};
+#ifdef _WIN32
+#include <windows.h>
+
+LONG WINAPI unhandledExceptionFilter(EXCEPTION_POINTERS* exInfo) {
+	cerr << "Unhandled exception: " << std::hex << exInfo->ExceptionRecord->ExceptionCode << '\n';
+	return EXCEPTION_EXECUTE_HANDLER;
+}
+#endif
 
 // Count leading tabs in a string
 int countLeadingTabs(const std::string& str) {
@@ -27,38 +75,61 @@ int countLeadingTabs(const std::string& str) {
     return count;
 }
 
-// Check if a line starts with "case" (after tabs)
-bool isCase(const std::string& line) {
+bool endsWith(const string& s, int c) {
+	return s.size() && s.back() == c;
+}
+
+    std::vector<std::string> text;
+	
+	int dent;
+	
+	int indent(int i){
+	ASSERT(i<text.size());
+		if(text[i].empty())return 1000000000;
+		return countLeadingTabs(text[i]);
+	}
+
+bool isSwitch(int i) {
+	auto line=text[i];
     size_t pos = line.find_first_not_of('\t');
     if (pos == std::string::npos) return false;
     
-    return line.substr(pos, 5) == "case ";
+    if( line.substr(pos, 7) == "switch ")
+	{
+		dent=pos;
+		return true;
+	}
+	
+	return false;
 }
 
-// Extract the sort key from a case line
-std::string extractSortKey(const std::string& line) {
-    size_t startPos = line.find("case ") + 5;
-    std::string key;
+bool isCase(int i) {
+	ASSERT(dent);
+	ASSERT(i<text.size());
+	auto line=text[i];
+    size_t pos = line.find_first_not_of('\t');
+    if (pos == std::string::npos) return false;
     
-    // Extract everything up to the colon or comma
-    size_t endPos = line.find(':', startPos);
-    size_t commaPos = line.find(',', startPos);
-    if (commaPos != std::string::npos && (endPos == std::string::npos || commaPos < endPos)) {
-        key = line.substr(startPos, commaPos - startPos);
-    } else if (endPos != std::string::npos) {
-        key = line.substr(startPos, endPos - startPos);
-    }
-    
-    // Trim whitespace
-    key.erase(0, key.find_first_not_of(" \t"));
-    key.erase(key.find_last_not_of(" \t") + 1);
-    
-    return key;
+    return line.substr(pos, 5) == "case "||line.substr(pos, 8) == "default:";
+}
+
+int parseCase(int i){
+	ASSERT(isCase(i));
+	bool brace=0;
+	while(isCase(i)){
+		if(endsWith(text[i],'{'))brace=1;
+		i++;
+	}
+}
+
+void sortCases1() {
+	int i=0;
+	for(;;){
+	}
 }
 
 // Sort cases in switch statements within a file
 std::string sortCases(const std::string& content) {
-    std::vector<std::string> lines;
     std::istringstream iss(content);
     std::string line;
     
@@ -68,122 +139,30 @@ std::string sortCases(const std::string& content) {
         if (!line.empty() && line.back() == '\r') {
             line.pop_back();
         }
-        lines.push_back(line);
+        text.push_back(line);
     }
     
     std::vector<std::string> result;
     size_t i = 0;
     
     while (i < lines.size()) {
-        // Look for switch statements
-        size_t pos = lines[i].find("switch");
-        if (pos != std::string::npos && pos == lines[i].find_first_not_of('\t')) {
-            // Found a switch statement, add it to result
-            result.push_back(lines[i]);
-            i++;
-            
-            int switchIndent = countLeadingTabs(lines[i-1]);
-            std::vector<CaseBlock> caseBlocks;
-            CaseBlock currentBlock;
-            bool inCaseBlock = false;
-
-            
-            // Process the switch body
-            while (i < lines.size()) {
-                line = lines[i];
-                int currentIndent = countLeadingTabs(line);
-                
-                // Check if we've exited the switch statement 
-                // (closing brace at same indentation level as the switch)
-                if (currentIndent == switchIndent && line.find('}') != std::string::npos) {
-                    // End of switch statement
-                    if (inCaseBlock) {
-                        caseBlocks.push_back(currentBlock);
-                    }
-                    
-                    // Sort the case blocks
-                    std::sort(caseBlocks.begin(), caseBlocks.end(), 
-                              [](const CaseBlock& a, const CaseBlock& b) {
-                                  return a.sortKey < b.sortKey;
-                              });
-                    
-                    // Add sorted case blocks to result
-                    for (const auto& block : caseBlocks) {
-                        for (const auto& blockLine : block.lines) {
-                            result.push_back(blockLine);
-                        }
-                    }
-                    
-                    // Add the closing brace
-                    result.push_back(line);
-                    i++;
-                    break;
-                }
-                
-                // We don't track brace balance - using indentation level only
-                
-                // Check if this is a new case
-                if (isCase(line) && currentIndent == switchIndent + 1) {
-                    if (inCaseBlock) {
-                        caseBlocks.push_back(currentBlock);
-                    }
-                    
-                    // Start a new case block
-                    currentBlock = CaseBlock();
-                    currentBlock.sortKey = extractSortKey(line);
-                    currentBlock.lines.push_back(line);
-                    inCaseBlock = true;
-                } else if (inCaseBlock) {
-                    // Detect end of case block by finding another case or indentation level
-                    // A case ends when we find another case at the same level,
-                    // or when we find a line with the same indentation as the switch
-                    // (unless it's a blank line)
-                    if ((isCase(line) && currentIndent == switchIndent + 1) || 
-                        (currentIndent == switchIndent && !line.empty() && line.find_first_not_of("\t ") != std::string::npos)) {
-                        caseBlocks.push_back(currentBlock);
-                        
-                        // If this is a new case, start a new block
-                        if (isCase(line)) {
-                            currentBlock = CaseBlock();
-                            currentBlock.sortKey = extractSortKey(line);
-                            currentBlock.lines.push_back(line);
-                        } else {
-                            // This isn't a case, so we're not in a case block anymore
-                            inCaseBlock = false;
-                            result.push_back(line);
-                        }
-                    } else {
-                        // Continue the current case block
-                        currentBlock.lines.push_back(line);
-                    }
-                } else {
-                    // Not in a case block yet (e.g., the opening brace of the switch)
-                    result.push_back(line);
-                }
-                
-                i++;
-            }
-        } else {
-            // Not a switch statement, just copy the line
-            result.push_back(lines[i]);
-            i++;
-        }
     }
     
     // Join lines with UNIX line endings
     std::ostringstream oss;
     for (size_t i = 0; i < result.size(); ++i) {
         oss << result[i];
-        if (i < result.size() - 1) {
             oss << '\n';
-        }
     }
     
     return oss.str();
 }
 
 int main(int argc, char* argv[]) {
-    bool writeToFile = false;
+#ifdef _WIN32
+		SetUnhandledExceptionFilter(unhandledExceptionFilter);
+#endif
+   bool writeToFile = false;
     std::vector<std::string> filenames;
     
     // Parse command line arguments
