@@ -191,17 +191,13 @@ std::string sortFileText(const std::string& content) {
 		}
 		lines.push_back(line);
 	}
-
-	std::vector<std::string> result;
-	size_t i = 0;
-
-	while (i < lines.size()) {
-	}
+	
+	sortLines();
 
 	// Join lines with UNIX line endings
 	std::ostringstream oss;
-	for (size_t i = 0; i < result.size(); ++i) {
-		oss << result[i];
+	for (size_t i = 0; i < lines.size(); ++i) {
+		oss << lines[i];
 		oss << '\n';
 	}
 
