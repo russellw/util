@@ -79,20 +79,20 @@ bool endsWith(const string& s, int c) {
 	return s.size() && s.back() == c;
 }
 
-std::vector<std::string> text;
+std::vector<std::string> lines;
 
 int dent;
 
 int indent(int i) {
-	ASSERT(i < text.size());
-	if (text[i].empty()) {
+	ASSERT(i < lines.size());
+	if (lines[i].empty()) {
 		return 1000000000;
 	}
-	return countLeadingTabs(text[i]);
+	return countLeadingTabs(lines[i]);
 }
 
 bool isSwitch(int i) {
-	auto line = text[i];
+	auto line = lines[i];
 	size_t pos = line.find_first_not_of('\t');
 	if (pos == std::string::npos) {
 		return false;
@@ -108,8 +108,8 @@ bool isSwitch(int i) {
 
 bool isCase(int i) {
 	ASSERT(dent);
-	ASSERT(i < text.size());
-	auto line = text[i];
+	ASSERT(i < lines.size());
+	auto line = lines[i];
 	size_t pos = line.find_first_not_of('\t');
 	if (pos == std::string::npos) {
 		return false;
@@ -122,7 +122,7 @@ int parseCase(int i) {
 	ASSERT(isCase(i));
 	bool brace = 0;
 	while (isCase(i)) {
-		if (endsWith(text[i], '{')) {
+		if (endsWith(lines[i], '{')) {
 			brace = 1;
 		}
 		i++;
@@ -132,7 +132,7 @@ int parseCase(int i) {
 	}
 	ASSERT(indent(i) == dent);
 	if (brace) {
-		ASSERT(text[i].substr(dent) == "}");
+		ASSERT(lines[i].substr(dent) == "}");
 		i++;
 	}
 	return i;
@@ -152,16 +152,16 @@ void sortSwitch(int i) {
 	while (isCase(i)) {
 		j = parseCase(i);
 		ASSERT(i < j);
-		cases.push_back(new Case(text.begin() + i, text.begin() + j));
+		cases.push_back(new Case(lines.begin() + i, lines.begin() + j));
 		i = j;
 	}
 	ASSERT(indent(i) == dent);
-	ASSERT(text[i].substr(dent) == "}");
+	ASSERT(lines[i].substr(dent) == "}");
 	std::sort(cases.begin(), cases.end(), [](const Case* a, const Case* b) { return a->v[0] < b->v[0]; });
 }
 
 void sortCases1() {
-	for (int i = 0; i < text.size(); i++) {
+	for (int i = 0; i < lines.size(); i++) {
 		if (isSwitch(i)) {
 			sortSwitch(i);
 		}
@@ -179,7 +179,7 @@ std::string sortCases(const std::string& content) {
 		if (!line.empty() && line.back() == '\r') {
 			line.pop_back();
 		}
-		text.push_back(line);
+		lines.push_back(line);
 	}
 
 	std::vector<std::string> result;
