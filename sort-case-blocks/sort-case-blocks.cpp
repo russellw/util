@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <sstream>
 
+#define dbg(a) std::cout << __FILE__ << ':' << __LINE__ << ": " << (a) << '\n'
+
 // Structure to represent a case block
 struct CaseBlock {
     std::vector<std::string> lines;
