@@ -160,7 +160,7 @@ void sortSwitch(int i) {
 	std::sort(cases.begin(), cases.end(), [](const Case* a, const Case* b) { return a->v[0] < b->v[0]; });
 }
 
-void sortCases1() {
+void sortLines() {
 	for (int i = 0; i < lines.size(); i++) {
 		if (isSwitch(i)) {
 			sortSwitch(i);
@@ -169,7 +169,7 @@ void sortCases1() {
 }
 
 // Sort cases in switch statements within a file
-std::string sortCases(const std::string& content) {
+std::string sortFileText(const std::string& content) {
 	std::istringstream iss(content);
 	std::string line;
 
@@ -235,7 +235,7 @@ int main(int argc, char* argv[]) {
 			inFile.close();
 
 			// Sort the cases
-			std::string sortedContent = sortCases(content);
+			std::string sortedContent = sortFileText(content);
 
 			// Check if there were any changes
 			bool hasChanges = (content != sortedContent);
