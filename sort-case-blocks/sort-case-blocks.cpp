@@ -191,7 +191,7 @@ std::string sortFileText(const std::string& content) {
 		}
 		lines.push_back(line);
 	}
-	
+
 	sortLines();
 
 	// Join lines with UNIX line endings
@@ -232,7 +232,7 @@ int main(int argc, char* argv[]) {
 			std::ifstream inFile(filename, std::ios::binary);
 			if (!inFile) {
 				std::cerr << "Error: Cannot open file " << filename << "\n";
-				continue;
+				return 1;
 			}
 
 			std::stringstream buffer;
@@ -251,7 +251,7 @@ int main(int argc, char* argv[]) {
 				std::ofstream outFile(filename, std::ios::binary | std::ios::trunc);
 				if (!outFile) {
 					std::cerr << "Error: Cannot write to file " << filename << "\n";
-					continue;
+					return 1;
 				}
 				outFile << sortedContent;
 				outFile.close();
@@ -259,9 +259,10 @@ int main(int argc, char* argv[]) {
 			} else if (!writeToFile) {
 				// Print to stdout
 				std::cout << sortedContent;
-			} 
+			}
 		} catch (const std::exception& e) {
 			std::cerr << "Error processing file " << filename << ": " << e.what() << "\n";
+			return 1;
 		}
 	}
 
