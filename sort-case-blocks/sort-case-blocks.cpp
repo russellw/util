@@ -145,20 +145,25 @@ struct Case {
 	}
 };
 
+void sortSwitch(int i) {
+	ASSERT(isSwitch(i));
+	i++;
+	vector<Case*> cases;
+	while (isCase(i)) {
+		j = parseCase(i);
+		ASSERT(i < j);
+		cases.push_back(new Case(text.begin() + i, text.begin() + j));
+		i = j;
+	}
+	ASSERT(indent(i) == dent);
+	ASSERT(text[i].substr(dent) == "}");
+	std::sort(cases.begin(), cases.end(), [](const Case* a, const Case* b) { return a->v[0] < b->v[0]; });
+}
+
 void sortCases1() {
 	for (int i = 0; i < text.size(); i++) {
 		if (isSwitch(i)) {
-			i++;
-			vector<Case*> cases;
-			while (isCase(i)) {
-				j = parseCase(i);
-				ASSERT(i < j);
-				cases.push_back(new Case(text.begin() + i, text.begin() + j));
-				i = j;
-			}
-			ASSERT(indent(i) == dent);
-			ASSERT(text[i].substr(dent) == "}");
-			std::sort(cases.begin(), cases.end(), [](const Case* a, const Case* b) { return a->v[0] < b->v[0]; });
+			sortSwitch(i);
 		}
 	}
 }
