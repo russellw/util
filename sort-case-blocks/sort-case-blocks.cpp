@@ -127,6 +127,15 @@ int parseCase(int i) {
 		}
 		i++;
 	}
+	while (indent(i) > dent) {
+		i++;
+	}
+	ASSERT(indent(i) == dent);
+	if (brace) {
+		ASSERT(text[i].substr(dent) == "}")
+		i++;
+	}
+	return i;
 }
 
 void sortCases1() {
