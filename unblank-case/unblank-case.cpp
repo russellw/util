@@ -87,11 +87,12 @@ std::string processContent(const std::string& content) {
 		}
 		lines.push_back(line);
 	}
-	
-	vector<string>result;
-	for(int i=0;i<lines.size();i++)
-	{
-		if(i+1<lines.size()&&lines[i].empty()&&isCase(i+1))continue;
+
+	vector<string> result;
+	for (int i = 0; i < lines.size(); i++) {
+		if (i + 1 < lines.size() && lines[i].empty() && isCase(i + 1)) {
+			continue;
+		}
 		result.push_back(lines[i]);
 	}
 
