@@ -151,7 +151,7 @@ void sortSwitch(int i) {
 	auto i0 = i;
 	vector<Case*> cases;
 	while (isCase(i)) {
-		j = parseCase(i);
+		int j = parseCase(i);
 		ASSERT(i < j);
 		cases.push_back(new Case(lines.begin() + i, lines.begin() + j));
 		i = j;
