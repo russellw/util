@@ -91,6 +91,17 @@ int indent(int i) {
 	return countLeadingTabs(lines[i]);
 }
 
+bool isComment(int i) {
+	ASSERT(i < lines.size());
+	auto line = lines[i];
+	size_t pos = line.find_first_not_of('\t');
+	if (pos == std::string::npos) {
+		return false;
+	}
+
+	return line.substr(pos, 2) == "//";
+}
+
 bool isSwitch(int i) {
 	auto line = lines[i];
 	size_t pos = line.find_first_not_of('\t');
@@ -99,6 +110,9 @@ bool isSwitch(int i) {
 	}
 
 	if (line.substr(pos, 7) == "switch ") {
+		if (isComment(i + 1)) {
+			return false;
+		}
 		dent = pos;
 		return true;
 	}
