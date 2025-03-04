@@ -145,6 +145,8 @@ struct Case {
 	}
 };
 
+string filename;
+
 void sortSwitch(int i) {
 	ASSERT(isSwitch(i));
 	i++;
@@ -157,7 +159,9 @@ void sortSwitch(int i) {
 		i = j;
 	}
 	ASSERT(indent(i) == dent);
-	ASSERT(lines[i].substr(dent) == "}");
+	if (lines[i].substr(dent) != "}") {
+		throw runtime_error(filename + ':' + std::to_string(i + 1) + ": expected '}'");
+	}
 
 	std::sort(cases.begin(), cases.end(), [](const Case* a, const Case* b) { return a->v[0] < b->v[0]; });
 
@@ -228,6 +232,8 @@ int main(int argc, char* argv[]) {
 
 	for (const auto& filename : filenames) {
 		try {
+			::filename = filename;
+
 			// Read the input file
 			std::ifstream inFile(filename, std::ios::binary);
 			if (!inFile) {
