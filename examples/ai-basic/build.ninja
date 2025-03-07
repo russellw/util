@@ -1,0 +1,34 @@
+cxx = clang
+cxxflags = -std=c++17 -c -ferror-limit=1 -Isrc -I\boost -Werror -Wno-switch
+
+rule cxx
+  command = $cxx $cxxflags $in -o $out
+  description = CXX $out
+
+rule link
+  command = $cxx $in -o $out
+  description = LINK $out
+
+build obj\etc.o: cxx src\etc.cpp | src\all.h src\etc.h src\parser.h
+build obj\parser.o: cxx src\parser.cpp | src\all.h src\etc.h src\parser.h
+build obj\main.o: cxx main.cpp | src\all.h src\etc.h src\parser.h
+
+build basic.exe: link obj\etc.o obj\parser.o obj\main.o
+
+default basic.exe
+
+build obj\tests\add-end.o: cxx unit-tests\add-end.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\add-subroutine.o: cxx unit-tests\add-subroutine.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\convert-tabs.o: cxx unit-tests\convert-tabs.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\extract-string-literals.o: cxx unit-tests\extract-string-literals.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\insert-let.o: cxx unit-tests\insert-let.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\main.o: cxx unit-tests\main.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\map-multi.o: cxx unit-tests\map-multi.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\norm-spaces.o: cxx unit-tests\norm-spaces.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\parse-label.o: cxx unit-tests\parse-label.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\remove-comment.o: cxx unit-tests\remove-comment.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\split-colons.o: cxx unit-tests\split-colons.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\split-print.o: cxx unit-tests\split-print.cpp | src\all.h src\etc.h src\parser.h
+build obj\tests\upper.o: cxx unit-tests\upper.cpp | src\all.h src\etc.h src\parser.h
+
+build test.exe: link obj\etc.o obj\parser.o obj\tests\add-end.o obj\tests\add-subroutine.o obj\tests\convert-tabs.o obj\tests\extract-string-literals.o obj\tests\insert-let.o obj\tests\main.o obj\tests\map-multi.o obj\tests\norm-spaces.o obj\tests\parse-label.o obj\tests\remove-comment.o obj\tests\split-colons.o obj\tests\split-print.o obj\tests\upper.o
