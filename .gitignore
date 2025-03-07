@@ -36,3 +36,5 @@ target/
 *.ll
 *.pdb
 *.o
+build.ninja
+.ninja_log
