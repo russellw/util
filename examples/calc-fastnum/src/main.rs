@@ -38,7 +38,7 @@ fn main() {
         io::stdin().read_line(&mut input).expect("Failed to read input");
         
         let input = input.trim();
-        if input.eq_ignore_ascii_case("quit") || input.eq_ignore_ascii_case("exit") {
+        if input.eq_ignore_ascii_case("q") || input.eq_ignore_ascii_case("quit") || input.eq_ignore_ascii_case("exit") {
             println!("Goodbye!");
             break;
         }
