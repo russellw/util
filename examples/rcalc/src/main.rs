@@ -1,5 +1,6 @@
 use std::io::{self, Write};
 use bigdecimal::BigDecimal;
+use bigdecimal::Zero;
 use std::str::FromStr;
 
 enum Operation {
