@@ -1,7 +1,8 @@
 use std::io::{self, Write};
-use fastnum::{dec256, D256};
+//use fastnum::{dec256, D256};
+use fastnum::{D256};
 use fastnum::decimal::Context;
-use std::str::FromStr;
+//use std::str::FromStr;
 
 enum Operation {
     Add,
