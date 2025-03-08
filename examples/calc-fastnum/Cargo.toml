@@ -1,7 +1,7 @@
 [package]
-name = "rcalc"
+name = "calc-fastnum"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-bigdecimal = "0.4"
+fastnum = "0.2"
