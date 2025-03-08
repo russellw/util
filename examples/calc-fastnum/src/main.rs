@@ -94,7 +94,7 @@ fn calculate_transcendental(operation: Operation, value: D256) -> Result<D256, S
     };
     
     // Convert back to D256
-    D256::from_str(&result.to_string())
+    D256::from_str(&result.to_string(),Context::default())
         .map_err(|_| "Error converting result back to D256".to_string())
 }
 
@@ -118,7 +118,7 @@ fn process_input(input: &str) -> Result<D256, String> {
             return Err("Unknown function or invalid input format".to_string());
         }
         
-        let value = D256::from_str(tokens[1])
+        let value = D256::from_str(tokens[1],Context::default())
             .map_err(|_| format!("Invalid number: {}", tokens[1]))?;
             
         return calculate_transcendental(operation, value);
@@ -132,7 +132,7 @@ fn process_input(input: &str) -> Result<D256, String> {
     let left = D256::from_str(tokens[0],Context::default())
         .map_err(|_| format!("Invalid first number: {}", tokens[0]))?;
     
-    let right = D256::from_str(tokens[2])
+    let right = D256::from_str(tokens[2],Context::default())
         .map_err(|_| format!("Invalid second number: {}", tokens[2]))?;
     
     let operation = match tokens[1] {
