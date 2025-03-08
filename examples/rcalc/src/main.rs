@@ -9,6 +9,13 @@ enum Operation {
     Multiply,
     Divide,
     Power,
+    Sin,
+    Cos,
+    Tan,
+    Ln,
+    Log10,
+    Exp,
+    Sqrt,
     Invalid,
 }
 
@@ -16,6 +23,8 @@ fn main() {
     println!("BigDecimal Desk Calculator");
     println!("Enter calculations in the format: <number> <operator> <number>");
     println!("Supported operators: + - * / ^");
+    println!("Transcendental functions: sin cos tan ln log10 exp sqrt");
+    println!("Function usage: <function> <number>");
     println!("Type 'quit' or 'exit' to end the program");
     println!("---------------------------------------");
 
@@ -53,11 +62,71 @@ fn main() {
     }
 }
 
+fn calculate_transcendental(operation: Operation, value: BigDecimal) -> Result<BigDecimal, String> {
+    // Convert BigDecimal to f64 for transcendental operations
+    let float_val = value.to_string().parse::<f64>()
+        .map_err(|_| "Could not convert to floating point for transcendental operation".to_string())?;
+    
+    let result = match operation {
+        Operation::Sin => float_val.sin(),
+        Operation::Cos => float_val.cos(),
+        Operation::Tan => float_val.tan(),
+        Operation::Ln => {
+            if float_val <= 0.0 {
+                return Err("Logarithm of non-positive number is undefined".to_string());
+            }
+            float_val.ln()
+        },
+        Operation::Log10 => {
+            if float_val <= 0.0 {
+                return Err("Logarithm of non-positive number is undefined".to_string());
+            }
+            float_val.log10()
+        },
+        Operation::Exp => float_val.exp(),
+        Operation::Sqrt => {
+            if float_val < 0.0 {
+                return Err("Square root of negative number is undefined in real domain".to_string());
+            }
+            float_val.sqrt()
+        },
+        _ => return Err("Invalid transcendental operation".to_string()),
+    };
+    
+    // Convert back to BigDecimal
+    BigDecimal::from_str(&result.to_string())
+        .map_err(|_| "Error converting result back to BigDecimal".to_string())
+}
+
 fn process_input(input: &str) -> Result<BigDecimal, String> {
     let tokens: Vec<&str> = input.split_whitespace().collect();
     
+    // Check for function operations (sin, cos, etc.)
+    if tokens.len() == 2 {
+        let operation = match tokens[0] {
+            "sin" => Operation::Sin,
+            "cos" => Operation::Cos,
+            "tan" => Operation::Tan,
+            "ln" => Operation::Ln,
+            "log10" => Operation::Log10,
+            "exp" => Operation::Exp,
+            "sqrt" => Operation::Sqrt,
+            _ => Operation::Invalid,
+        };
+        
+        if let Operation::Invalid = operation {
+            return Err("Unknown function or invalid input format".to_string());
+        }
+        
+        let value = BigDecimal::from_str(tokens[1])
+            .map_err(|_| format!("Invalid number: {}", tokens[1]))?;
+            
+        return calculate_transcendental(operation, value);
+    }
+    
+    // Regular binary operations
     if tokens.len() != 3 {
-        return Err("Input must be in the format: <number> <operator> <number>".to_string());
+        return Err("Input must be in the format: <number> <operator> <number> or <function> <number>".to_string());
     }
     
     let left = BigDecimal::from_str(tokens[0])
@@ -104,5 +173,10 @@ fn process_input(input: &str) -> Result<BigDecimal, String> {
             }
         }
         Operation::Invalid => Err(format!("Unknown operator: {}", tokens[1])),
+        // These operations shouldn't be reached here, but handle them for exhaustiveness
+        Operation::Sin | Operation::Cos | Operation::Tan | 
+        Operation::Ln | Operation::Log10 | Operation::Exp | Operation::Sqrt => {
+            Err("Transcendental functions should be used with the format: <function> <number>".to_string())
+        },
     }
 }
