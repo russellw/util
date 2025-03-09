@@ -5,21 +5,17 @@ use std::fmt;
 use std::ops::{Add, Div, Mul, Sub};
 use std::rc::Rc;
 
-// Value doesn't include errors
 #[derive(Clone, Debug)]
 pub enum Value {
     Number(D256),
     String(Rc<String>),
-    Array(Rc<HashMap<usize, Value>>),
 }
 
-// Type alias for convenience
 pub type EvalResult = Result<Value, String>;
 
 const NO_TRAPS: Context = Context::default().without_traps();
 
 impl Value {
-    // Create helpers remain the same
     pub fn number(n: D256) -> Self {
         Value::Number(n)
     }
@@ -28,12 +24,10 @@ impl Value {
         Value::String(Rc::new(s.into()))
     }
 
-    // Type checking methods remain the same
     pub fn is_number(&self) -> bool {
         matches!(self, Value::Number(_))
     }
 
-    // As do conversion methods
     pub fn as_number(&self) -> Option<D256> {
         match self {
             Value::Number(n) => Some(*n),
@@ -42,17 +36,14 @@ impl Value {
         }
     }
 
-    // Adding the as_string method that was missing
     pub fn as_string(&self) -> String {
         match self {
             Value::String(s) => s.to_string(),
             Value::Number(n) => n.to_string(),
-            Value::Array(_) => "[Array]".to_string(),
         }
     }
 }
 
-// For expression evaluation using Result
 impl Add for Value {
     type Output = EvalResult;
 
@@ -80,7 +71,6 @@ impl Add for Value {
     }
 }
 
-// Division would properly handle errors
 impl Div for Value {
     type Output = EvalResult;
 
@@ -99,18 +89,25 @@ impl Div for Value {
     }
 }
 
-// Adding a simple main function to make the compiler happy
+impl fmt::Display for Value {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Value::Number(a) => write!(f, "{}", a),
+            Value::String(s) => write!(f, "{}", s),
+        }
+    }
+}
+
 fn main() {
     println!("BASIC Interpreter Value Type Example");
 
-    // Example usage:
     let num_val = Value::number(dec256!(42.0).with_ctx(NO_TRAPS));
     let str_val = Value::string("Hello, BASIC!");
 
     println!("Number: {:?}", num_val);
+    println!("Number: {}", num_val);
     println!("String: {:?}", str_val);
 
-    // Example of error handling with division
     let ten = Value::number(dec256!(10.0).with_ctx(NO_TRAPS));
     let zero = Value::number(dec256!(0.0).with_ctx(NO_TRAPS));
 
