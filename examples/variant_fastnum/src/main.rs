@@ -22,7 +22,6 @@ pub enum Value {
     Number(D256),
     String(Rc<String>),
     Array(Rc<HashMap<usize, Value>>),
-    Null,
 }
 
 // Type alias for convenience
