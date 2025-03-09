@@ -71,7 +71,7 @@ impl Add for Value {
     fn add(self, other: Value) -> EvalResult {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => {
-                Ok(Value::Number(a + b))
+                Ok(Value::Number(a.clone() + b.clone()))
             },
             (Value::String(a), Value::String(b)) => {
                 let mut new_string = a.to_string();
@@ -82,7 +82,7 @@ impl Add for Value {
             _ => {
                 // Try numeric addition with coercion
                 if let (Some(a), Some(b)) = (self.as_number(), other.as_number()) {
-                    Ok(Value::Number(a + b))
+                    Ok(Value::Number(a.clone() + b.clone()))
                 } else {
                     // Fall back to string concatenation
                     let mut result = self.as_string();
@@ -101,19 +101,19 @@ impl Div for Value {
     fn div(self, other: Value) -> EvalResult {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => {
-                if *b == dec!(0.0) {
+                if *b == dec256!(0.0) {
                     Err(InterpreterError::DivisionByZero)
                 } else {
-                    Ok(Value::Number(a / b))
+                    Ok(Value::Number(a.clone() / b.clone()))
                 }
             },
             _ => {
                 // Try numeric division with coercion
                 if let (Some(a), Some(b)) = (self.as_number(), other.as_number()) {
-                    if b == dec!(0.0) {
+                    if b == dec256!(0.0) {
                         Err(InterpreterError::DivisionByZero)
                     } else {
-                        Ok(Value::Number(a / b))
+                        Ok(Value::Number(a.clone() / b.clone()))
                     }
                 } else {
                     Err(InterpreterError::TypeError(
@@ -130,15 +130,15 @@ fn main() {
     println!("BASIC Interpreter Value Type Example");
     
     // Example usage:
-    let num_val = Value::number(dec!(42.0));
+    let num_val = Value::number(dec256!(42.0));
     let str_val = Value::string("Hello, BASIC!");
     
     println!("Number: {:?}", num_val);
     println!("String: {:?}", str_val);
     
     // Example of error handling with division
-    let ten = Value::number(dec!(10.0));
-    let zero = Value::number(dec!(0.0));
+    let ten = Value::number(dec256!(10.0));
+    let zero = Value::number(dec256!(0.0));
     
     match ten/zero {
         Ok(result) => println!("Result: {:?}", result),
