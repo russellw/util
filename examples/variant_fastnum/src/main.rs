@@ -32,7 +32,6 @@ impl Value {
         match self {
             Value::Number(n) => Some(*n),
             Value::String(s) => s.parse::<D256>().ok(),
-            _ => None,
         }
     }
 
@@ -99,9 +98,7 @@ impl fmt::Display for Value {
 }
 
 fn main() {
-    println!("BASIC Interpreter Value Type Example");
-
-    let num_val = Value::number(dec256!(42.0).with_ctx(NO_TRAPS));
+    let num_val = Value::number(dec256!(42).with_ctx(NO_TRAPS));
     let str_val = Value::string("Hello, BASIC!");
 
     println!("Number: {:?}", num_val);
