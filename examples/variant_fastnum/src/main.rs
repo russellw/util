@@ -22,7 +22,6 @@ pub enum InterpreterError {
 pub enum Value {
     Number(D256),
     String(Rc<String>),
-    Boolean(bool),
     Array(Rc<HashMap<usize, Value>>),
     Null,
 }
@@ -50,7 +49,6 @@ impl Value {
         match self {
             Value::Number(n) => Some(*n),
             Value::String(s) => s.parse::<D256>().ok(),
-            Value::Boolean(b) => Some(if *b { 1.0 } else { 0.0 }),
             _ => None,
         }
     }
@@ -60,7 +58,6 @@ impl Value {
         match self {
             Value::String(s) => s.to_string(),
             Value::Number(n) => n.to_string(),
-            Value::Boolean(b) => b.to_string(),
             Value::Array(_) => "[Array]".to_string(),
             Value::Null => "".to_string(),
         }
@@ -104,7 +101,7 @@ impl Div for Value {
     fn div(self, other: Value) -> EvalResult {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => {
-                if *b == 0.0 {
+                if *b == dec!(0.0) {
                     Err(InterpreterError::DivisionByZero)
                 } else {
                     Ok(Value::Number(a / b))
@@ -113,7 +110,7 @@ impl Div for Value {
             _ => {
                 // Try numeric division with coercion
                 if let (Some(a), Some(b)) = (self.as_number(), other.as_number()) {
-                    if b == 0.0 {
+                    if b == dec!(0.0) {
                         Err(InterpreterError::DivisionByZero)
                     } else {
                         Ok(Value::Number(a / b))
@@ -133,15 +130,15 @@ fn main() {
     println!("BASIC Interpreter Value Type Example");
     
     // Example usage:
-    let num_val = Value::number(42.0);
+    let num_val = Value::number(dec!(42.0));
     let str_val = Value::string("Hello, BASIC!");
     
     println!("Number: {:?}", num_val);
     println!("String: {:?}", str_val);
     
     // Example of error handling with division
-    let ten = Value::number(10.0);
-    let zero = Value::number(0.0);
+    let ten = Value::number(dec!(10.0));
+    let zero = Value::number(dec!(0.0));
     
     match ten/zero {
         Ok(result) => println!("Result: {:?}", result),
