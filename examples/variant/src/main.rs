@@ -38,33 +38,6 @@ impl Value {
         Value::String(Rc::new(s.into()))
     }
 
-    // But operations now return Result<Value, InterpreterError>
-    pub fn divide(&self, other: &Value) -> EvalResult {
-        match (self, other) {
-            (Value::Number(a), Value::Number(b)) => {
-                if *b == 0.0 {
-                    Err(InterpreterError::DivisionByZero)
-                } else {
-                    Ok(Value::Number(a / b))
-                }
-            },
-            _ => {
-                // Attempt type coercion
-                if let (Some(a), Some(b)) = (self.as_number(), other.as_number()) {
-                    if b == 0.0 {
-                        Err(InterpreterError::DivisionByZero)
-                    } else {
-                        Ok(Value::Number(a / b))
-                    }
-                } else {
-                    Err(InterpreterError::TypeError(
-                        "Cannot divide these types".to_string()
-                    ))
-                }
-            }
-        }
-    }
-
     // Type checking methods remain the same
     pub fn is_number(&self) -> bool {
         matches!(self, Value::Number(_))
@@ -168,7 +141,7 @@ fn main() {
     let ten = Value::number(10.0);
     let zero = Value::number(0.0);
     
-    match ten.divide(&zero) {
+    match ten/zero {
         Ok(result) => println!("Result: {:?}", result),
         Err(error) => println!("Error: {:?}", error)
     }
