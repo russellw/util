@@ -5,17 +5,6 @@ use std::fmt;
 use std::ops::{Add, Div, Mul, Sub};
 use std::rc::Rc;
 
-// Define error types separately from values
-#[derive(Clone, Debug, PartialEq)]
-pub enum InterpreterError {
-    TypeError(String),
-    IndexOutOfBounds,
-    Overflow,
-    UndefinedVariable(String),
-    SyntaxError(String),
-    // Add other error types as needed
-}
-
 // Value doesn't include errors
 #[derive(Clone, Debug)]
 pub enum Value {
@@ -25,7 +14,7 @@ pub enum Value {
 }
 
 // Type alias for convenience
-pub type EvalResult = Result<Value, InterpreterError>;
+pub type EvalResult = Result<Value, String>;
 
 const NO_TRAPS: Context = Context::default().without_traps();
 
@@ -59,7 +48,6 @@ impl Value {
             Value::String(s) => s.to_string(),
             Value::Number(n) => n.to_string(),
             Value::Array(_) => "[Array]".to_string(),
-            Value::Null => "".to_string(),
         }
     }
 }
@@ -104,9 +92,7 @@ impl Div for Value {
                 if let (Some(a), Some(b)) = (self.as_number(), other.as_number()) {
                     Ok(Value::Number(a.clone() / b.clone()))
                 } else {
-                    Err(InterpreterError::TypeError(
-                        "Cannot divide these types".to_string(),
-                    ))
+                    Err("Cannot divide these types".to_string())
                 }
             }
         }
