@@ -101,11 +101,7 @@ impl Div for Value {
     fn div(self, other: Value) -> EvalResult {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => {
-                if *b == dec256!(0.0) {
-                    Err(InterpreterError::DivisionByZero)
-                } else {
                     Ok(Value::Number(a.clone() / b.clone()))
-                }
             },
             _ => {
                 // Try numeric division with coercion
