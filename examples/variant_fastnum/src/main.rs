@@ -2,7 +2,7 @@ use std::collections::HashMap;
 use std::fmt;
 use std::ops::{Add, Sub, Mul, Div};
 use std::rc::Rc;
-use fastnum::{udec256, UD256};
+use fastnum::{dec256, D256};
 use fastnum::decimal::Context;
 
 // Define error types separately from values
