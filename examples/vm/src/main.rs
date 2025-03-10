@@ -1,6 +1,5 @@
 use fastnum::decimal::Context;
 use fastnum::{dec256, D256};
-use std::collections::HashMap;
 use std::fmt;
 use std::ops::{Add, Div, Mul, Sub};
 use std::rc::Rc;
@@ -49,18 +48,7 @@ impl Add for Value {
     fn add(self, other: Value) -> EvalResult {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => Ok(Value::Number(a.clone() + b.clone())),
-            (Value::String(a), Value::String(b)) => {
-                let mut new_string = a.to_string();
-                new_string.push_str(b);
-                Ok(Value::String(Rc::new(new_string)))
-            }
-            // Other cases and coercion
             _ => {
-                // Try numeric addition with coercion
-                if let (Some(a), Some(b)) = (self.as_number(), other.as_number()) {
-                    Ok(Value::Number(a.clone() + b.clone()))
-                } else {
-                    // Fall back to string concatenation
                     let mut result = self.as_string();
                     result.push_str(&other.as_string());
                     Ok(Value::String(Rc::new(result)))
@@ -68,7 +56,6 @@ impl Add for Value {
             }
         }
     }
-}
 
 impl Div for Value {
     type Output = EvalResult;
@@ -76,11 +63,32 @@ impl Div for Value {
     fn div(self, other: Value) -> EvalResult {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => Ok(Value::Number(a.clone() / b.clone())),
-            _ => 
-                    Err("/: expected numbers".to_string())
-            }
+            _ => Err("/: expected numbers".to_string()),
         }
     }
+}
+
+impl Mul for Value {
+    type Output = EvalResult;
+
+    fn mul(self, other: Value) -> EvalResult {
+        match (&self, &other) {
+            (Value::Number(a), Value::Number(b)) => Ok(Value::Number(a.clone() * b.clone())),
+            _ => Err("*: expected numbers".to_string()),
+        }
+    }
+}
+
+impl Sub for Value {
+    type Output = EvalResult;
+
+    fn sub(self, other: Value) -> EvalResult {
+        match (&self, &other) {
+            (Value::Number(a), Value::Number(b)) => Ok(Value::Number(a.clone() - b.clone())),
+            _ => Err("-: expected numbers".to_string()),
+        }
+    }
+}
 
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
