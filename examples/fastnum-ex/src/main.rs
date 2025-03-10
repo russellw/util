@@ -1,11 +1,11 @@
-use fastnum::{udec256, UD256};
+use fastnum::{dec256};
 
 fn main() {
-    let a = udec256!(0.1);
-    let b = udec256!(0.2);
+    let a = dec256!(10);
+    let b = usize::try_from(a);
+    println!("{:?}", b);
 
-    assert_eq!(a + b, udec256!(0.3));
-
-    println!("Hello, world!");
-    println!("{}", a);
+    let a = dec256!(-10);
+    let b = usize::try_from(a);
+    println!("{:?}", b);
 }
