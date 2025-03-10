@@ -66,9 +66,16 @@ impl Mul for Value {
             (Value::Number(a), Value::String(b)) => {
                 let count = match usize::try_from(*a) {
                     Ok(n) => n,
-                    Err(_) => return Err("Cannot convert number to repeat count".to_string()),
+                    Err(_) => return Err("*: cannot convert number to repeat count".to_string()),
                 };
                 Ok(Value::String(Rc::new(b.repeat(count))))
+            }
+            (Value::String(a), Value::Number(b)) => {
+                let count = match usize::try_from(*b) {
+                    Ok(n) => n,
+                    Err(_) => return Err("*: cannot convert number to repeat count".to_string()),
+                };
+                Ok(Value::String(Rc::new(a.repeat(count))))
             }
             _ => Err("*: expected numbers".to_string()),
         }
