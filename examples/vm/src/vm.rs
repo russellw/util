@@ -63,7 +63,13 @@ impl Mul for Value {
     fn mul(self, other: Value) -> EvalResult {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => Ok(Value::Number(a.clone() * b.clone())),
-            (Value::Number(a), Value::String(b)) => Ok(Value::String(b.repeat(a as usize).into())),
+            (Value::Number(a), Value::String(b)) => {
+                let count = match usize::try_from(*a) {
+                    Ok(n) => n,
+                    Err(_) => return Err("Cannot convert number to repeat count".to_string()),
+                };
+                Ok(Value::String(Rc::new(b.repeat(count))))
+            }
             _ => Err("*: expected numbers".to_string()),
         }
     }
