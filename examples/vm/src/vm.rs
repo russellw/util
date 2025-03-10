@@ -30,6 +30,13 @@ impl Value {
             Value::Number(a) => a.to_string(),
         }
     }
+
+    pub fn truth(&self) -> bool {
+        match self {
+            Value::String(s) => s.len()!=0,
+            Value::Number(a) => !a.is_zero(),
+        }
+    }
 }
 
 impl Add for Value {
