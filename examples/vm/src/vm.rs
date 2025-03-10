@@ -1,5 +1,5 @@
 use fastnum::decimal::Context;
-use fastnum::{D256};
+use fastnum::D256;
 use std::fmt;
 use std::ops::{Add, Div, Mul, Sub};
 use std::rc::Rc;
@@ -38,13 +38,13 @@ impl Add for Value {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => Ok(Value::Number(a.clone() + b.clone())),
             _ => {
-                    let mut result = self.as_string();
-                    result.push_str(&other.as_string());
-                    Ok(Value::String(Rc::new(result)))
-                }
+                let mut result = self.as_string();
+                result.push_str(&other.as_string());
+                Ok(Value::String(Rc::new(result)))
             }
         }
     }
+}
 
 impl Div for Value {
     type Output = EvalResult;

@@ -1,4 +1,4 @@
-use fastnum::{dec256};
+use fastnum::dec256;
 
 mod vm;
 use vm::*;
