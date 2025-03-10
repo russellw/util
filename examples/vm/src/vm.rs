@@ -12,6 +12,7 @@ pub enum Value {
 
 pub type EvalResult = Result<Value, String>;
 
+// fastnum provides Inf, so we might as well use it
 pub const NO_TRAPS: Context = Context::default().without_traps();
 
 impl Value {
