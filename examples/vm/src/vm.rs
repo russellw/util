@@ -63,6 +63,7 @@ impl Mul for Value {
     fn mul(self, other: Value) -> EvalResult {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => Ok(Value::Number(a.clone() * b.clone())),
+            (Value::Number(a), Value::String(b)) => Ok(Value::String(b.repeat(a as usize).into())),
             _ => Err("*: expected numbers".to_string()),
         }
     }
