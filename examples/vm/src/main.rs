@@ -16,8 +16,8 @@ pub type EvalResult = Result<Value, String>;
 const NO_TRAPS: Context = Context::default().without_traps();
 
 impl Value {
-    pub fn number(n: D256) -> Self {
-        Value::Number(n)
+    pub fn number(a: D256) -> Self {
+        Value::Number(a)
     }
 
     pub fn string<S: Into<String>>(s: S) -> Self {
@@ -30,7 +30,7 @@ impl Value {
 
     pub fn as_number(&self) -> Option<D256> {
         match self {
-            Value::Number(n) => Some(*n),
+            Value::Number(a) => Some(*a),
             Value::String(s) => s.parse::<D256>().ok(),
         }
     }
@@ -38,7 +38,7 @@ impl Value {
     pub fn as_string(&self) -> String {
         match self {
             Value::String(s) => s.to_string(),
-            Value::Number(n) => n.to_string(),
+            Value::Number(a) => a.to_string(),
         }
     }
 }
@@ -76,17 +76,11 @@ impl Div for Value {
     fn div(self, other: Value) -> EvalResult {
         match (&self, &other) {
             (Value::Number(a), Value::Number(b)) => Ok(Value::Number(a.clone() / b.clone())),
-            _ => {
-                // Try numeric division with coercion
-                if let (Some(a), Some(b)) = (self.as_number(), other.as_number()) {
-                    Ok(Value::Number(a.clone() / b.clone()))
-                } else {
-                    Err("Cannot divide these types".to_string())
-                }
+            _ => 
+                    Err("/: expected numbers".to_string())
             }
         }
     }
-}
 
 impl fmt::Display for Value {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
