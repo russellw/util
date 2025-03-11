@@ -1,0 +1,9 @@
+[package]
+name = "multibin_project"
+version = "0.1.0"
+edition = "2021"
+
+# No [[bin]] sections needed - automatic discovery handles this
+
+[dependencies]
+# Your dependencies here
