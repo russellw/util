@@ -1,3 +1,8 @@
+use fastnum::dec256;
+use num_traits::ToPrimitive;
+
 fn main() {
-    println!("Hello, world!");
+    let a = dec256!(10);
+    let b = a.to_usize();
+    println!("{:?}", b);
 }
