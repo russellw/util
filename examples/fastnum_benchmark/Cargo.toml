@@ -1,0 +1,8 @@
+[package]
+name = "fastnum_benchmark"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+fastnum = { version = "0.2", features = ["numtraits"] }
+num-traits = "0.2"
