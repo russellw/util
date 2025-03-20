@@ -105,5 +105,13 @@ impl fmt::Display for Val {
 }
 
 fn main() {
-    println!("Hello, world!");
+    let sqrt = Val::func(|x: Val| -> Result<Val, String> {
+        match x {
+            Val::Float(n) => Ok(Val::Float(n.sqrt())),
+            _ => Err("Expected float".to_string()),
+        }
+    });
+    //let r = sqrt.apply(&[Val::Float(16.0)]).unwrap();
+    let r = sqrt.apply(Val::Float(16.0)).unwrap();
+    println!("{:?}", r);
 }
