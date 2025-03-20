@@ -13,6 +13,20 @@ pub enum Val {
     Func(Rc<dyn Fn(Val) -> Result<Val, String>>),
 }
 
+/// Trait for anything that can be converted into a Val::Func
+pub trait IntoValFunction {
+    fn into_val_function(self) -> Val;
+}
+
+/// Trait that all callable value functions must implement
+pub trait ValCallable: fmt::Debug {
+    /// Call the function with a list of arguments
+    fn call(&self, args: &[Val]) -> Result<Val, String>;
+
+    /// Return the expected number of arguments
+    fn arity(&self) -> usize;
+}
+
 impl Val {
     /// Creates a new string value from any type that can be converted to a String.
     ///
@@ -27,20 +41,35 @@ impl Val {
         Val::Str(Rc::new(s.into()))
     }
 
-    /// Creates a new function value.
+    /// Creates a new function value from any type that can be converted to a Val::Func.
     ///
     /// # Arguments
     ///
-    /// * `f` - A function that takes a Val and returns a Result with Val or error
+    /// * `f` - A function that can be converted into a Val::Func
     ///
     /// # Returns
     ///
     /// A Val::Func containing the function
-    pub fn func<F>(f: F) -> Self
-    where
-        F: Fn(Val) -> Result<Val, String> + 'static,
-    {
-        Val::Func(Rc::new(f))
+    pub fn func<F: IntoValFunction>(f: F) -> Self {
+        f.into_val_function()
+    }
+
+    /// Applies the function to arguments if this value is a function.
+    ///
+    /// # Arguments
+    ///
+    /// * `args` - The arguments to pass to the function
+    ///
+    /// # Returns
+    ///
+    /// * `Ok(Val)` - The successful result of applying the function
+    /// * `Err(String)` - If the function returned an error
+    /// * `Err("Not a function")` - If this value is not a function
+    pub fn apply(&self, args: &[Val]) -> Result<Val, String> {
+        match self {
+            Val::Func(f) => f.call(args),
+            _ => Err("Not a function".to_string()),
+        }
     }
 
     /// Attempts to convert the value to an f64.
@@ -104,6 +133,68 @@ impl fmt::Display for Val {
     }
 }
 
+// Implementation for a function with 1 parameter
+impl<F> IntoValFunction for F
+where
+    F: Fn(Val) -> Result<Val, String> + 'static + fmt::Debug,
+{
+    fn into_val_function(self) -> Val {
+        Val::Func(Rc::new(ValFunction1(self)))
+    }
+}
+
+// Implementation for a function with 2 parameters
+impl<F> IntoValFunction for F
+where
+    F: Fn(Val, Val) -> Result<Val, String> + 'static + fmt::Debug,
+{
+    fn into_val_function(self) -> Val {
+        Val::Func(Rc::new(ValFunction2(self)))
+    }
+}
+
+// Wrapper for a 1-parameter function
+#[derive(Debug)]
+struct ValFunction1<F>(F);
+
+impl<F> ValCallable for ValFunction1<F>
+where
+    F: Fn(Val) -> Result<Val, String> + 'static + fmt::Debug,
+{
+    fn call(&self, args: &[Val]) -> Result<Val, String> {
+        if args.len() != 1 {
+            return Err(format!("Expected 1 argument, got {}", args.len()));
+        }
+
+        (self.0)(args[0].clone())
+    }
+
+    fn arity(&self) -> usize {
+        1
+    }
+}
+
+// Wrapper for a 2-parameter function
+#[derive(Debug)]
+struct ValFunction2<F>(F);
+
+impl<F> ValCallable for ValFunction2<F>
+where
+    F: Fn(Val, Val) -> Result<Val, String> + 'static + fmt::Debug,
+{
+    fn call(&self, args: &[Val]) -> Result<Val, String> {
+        if args.len() != 2 {
+            return Err(format!("Expected 2 arguments, got {}", args.len()));
+        }
+
+        (self.0)(args[0].clone(), args[1].clone())
+    }
+
+    fn arity(&self) -> usize {
+        2
+    }
+}
+
 fn main() {
     let sqrt = Val::func(|x: Val| -> Result<Val, String> {
         match x {
@@ -111,7 +202,6 @@ fn main() {
             _ => Err("Expected float".to_string()),
         }
     });
-    //let r = sqrt.apply(&[Val::Float(16.0)]).unwrap();
-    let r = sqrt.apply(Val::Float(16.0)).unwrap();
+    let r = sqrt.apply(&[Val::Float(16.0)]).unwrap();
     println!("{:?}", r);
 }
