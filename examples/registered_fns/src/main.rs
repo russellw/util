@@ -1,8 +1,9 @@
-use std::cell::RefCell;
 use std::fmt;
 use std::rc::Rc;
 
-#[derive(Clone, Debug, PartialEq)]
+// Remove PartialEq and Debug from the derive attributes for the Val enum
+// We'll implement them manually
+#[derive(Clone)]
 pub enum Val {
     /// Floating-point value
     Float(f64),
@@ -70,11 +71,26 @@ impl Val {
     }
 }
 
-pub fn eq(a: &Val, b: &Val) -> bool {
-    match (a, b) {
-        // TODO: is this needed?
-        (Val::Func(a), Val::Func(b)) => Rc::ptr_eq(a, b),
-        _ => a == b,
+// Implement PartialEq manually for Val
+impl PartialEq for Val {
+    fn eq(&self, other: &Self) -> bool {
+        match (self, other) {
+            (Val::Float(a), Val::Float(b)) => a == b,
+            (Val::Str(a), Val::Str(b)) => a == b,
+            (Val::Func(a), Val::Func(b)) => Rc::ptr_eq(a, b), // Compare function pointers
+            _ => false,
+        }
+    }
+}
+
+// Implement Debug manually for Val
+impl fmt::Debug for Val {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Val::Float(a) => write!(f, "Float({:?})", a),
+            Val::Str(s) => write!(f, "Str({:?})", s),
+            Val::Func(_) => write!(f, "Func(<function>)"),
+        }
     }
 }
 
