@@ -36,15 +36,6 @@ impl Str32 {
         self.v.iter().collect()
     }
 
-    // Creates a new Str32 with the characters in reverse order
-    pub fn reverse(&self) -> Self {
-        let mut reversed: Vec<char> = self.v.to_vec();
-        reversed.reverse();
-        Self {
-            v: reversed.into_boxed_slice(),
-        }
-    }
-
     // Creates a substring from a range of indices
     pub fn substring(&self, start: usize, end: usize) -> Result<Self, String> {
         if start > end {
@@ -145,7 +136,6 @@ fn main() {
 
     // String manipulations
     println!("\nString manipulations:");
-    println!("s1 reversed: {}", s1.reverse());
     println!("s1 uppercase: {}", s1.to_uppercase());
     println!("s1 lowercase: {}", s1.to_lowercase());
 
