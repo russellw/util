@@ -63,11 +63,6 @@ impl Str32 {
         }
     }
 
-    // Checks if the string contains a specific character
-    pub fn contains(&self, c: char) -> bool {
-        self.v.contains(&c)
-    }
-
     // Returns a new Str32 with all uppercase characters
     pub fn upper(&self) -> Self {
         let r: Vec<char> = self
@@ -155,11 +150,6 @@ fn main() {
     println!("\nConcatenation:");
     let s3 = s1.concat(&s2);
     println!("s1 + s2: {}", s3);
-
-    // Character search
-    println!("\nCharacter search:");
-    println!("s1 contains 'o': {}", s1.contains('o'));
-    println!("s1 contains 'z': {}", s1.contains('z'));
 
     // Equality check (using derived PartialEq)
     println!("\nEquality check:");
