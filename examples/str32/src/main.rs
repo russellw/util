@@ -12,6 +12,14 @@ impl Str32 {
         }
     }
 
+    // Constructor from a String
+    pub fn from_string(s: String) -> Self {
+        let chars: Vec<char> = s.chars().collect();
+        Self {
+            v: chars.into_boxed_slice(),
+        }
+    }
+
     // Constructor from a single character
     pub fn from_char(c: char) -> Self {
         Self {
@@ -153,6 +161,10 @@ fn main() {
     let s1_copy = Str32::new("Hello, world!");
     println!("s1 == s1_copy: {}", s1 == s1_copy);
     println!("s1 == s2: {}", s1 == s2);
+
+    // From String
+    let string_str = Str32::from_string(String::from("From a String"));
+    println!("From String: {}", string_str);
 
     // From char
     let char_str = Str32::from_char('A');
