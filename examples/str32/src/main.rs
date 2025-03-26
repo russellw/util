@@ -37,27 +37,18 @@ impl Str32 {
     }
 
     // Creates a substring from a range of indices
-    pub fn substr(&self, start: usize, end: usize) -> Result<Self, String> {
-        if start > end {
-            return Err("Start index must be less than or equal to end index".to_string());
-        }
-        if end > self.len() {
-            return Err("End index out of range".to_string());
-        }
-
-        let slice = &self.v[start..end];
+    pub fn substr(&self, i: usize, j: usize) -> Self {
+        let slice = &self.v[i..j];
         let chars: Vec<char> = slice.to_vec();
-
-        Ok(Self {
+        Self {
             v: chars.into_boxed_slice(),
-        })
+        }
     }
 
     // Concatenates two Str32 instances
-    pub fn concat(&self, other: &Self) -> Self {
+    pub fn add(&self, b: &Self) -> Self {
         let mut result: Vec<char> = self.v.to_vec();
-        result.extend(other.v.iter());
-
+        result.extend(b.v.iter());
         Self {
             v: result.into_boxed_slice(),
         }
@@ -136,19 +127,11 @@ fn main() {
 
     // Substrings
     println!("\nSubstrings:");
-    match s1.substr(0, 5) {
-        Ok(sub) => println!("s1[0..5]: {}", sub),
-        Err(e) => println!("Error: {}", e),
-    }
-
-    match s1.substr(7, 5) {
-        Ok(sub) => println!("s1[7..5]: {}", sub),
-        Err(e) => println!("Error: {}", e),
-    }
+    println!("s1[0..5]: {}", s1.substr(0, 5));
 
     // Concatenation
     println!("\nConcatenation:");
-    let s3 = s1.concat(&s2);
+    let s3 = s1.add(&s2);
     println!("s1 + s2: {}", s3);
 
     // Equality check (using derived PartialEq)
