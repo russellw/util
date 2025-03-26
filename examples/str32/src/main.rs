@@ -1,6 +1,8 @@
+use std::collections::HashMap;
+use std::hash::{Hash, Hasher};
 use std::rc::Rc;
 
-#[derive(PartialEq)]
+#[derive(Eq, Hash, PartialEq)]
 pub struct Str32 {
     v: Rc<[char]>,
 }
@@ -160,4 +162,21 @@ fn main() {
     let vec_chars = vec!['R', 'u', 's', 't'];
     let vec_str = Str32::from_vec(vec_chars);
     println!("From Vec<char>: {}", vec_str);
+
+    // Testing hash table usage
+    println!("\nTesting hash table usage:");
+    let mut str_map: HashMap<Str32, i32> = HashMap::new();
+
+    // Insert some values
+    str_map.insert(Str32::new("one"), 1);
+    str_map.insert(Str32::new("two"), 2);
+    str_map.insert(Str32::new("three"), 3);
+    str_map.insert(Str32::new("three"), 4);
+    println!("{}", str_map.len());
+
+    // Look up values
+    match str_map.get(&Str32::new("two")) {
+        Some(value) => println!("Found 'two' with value: {}", value),
+        None => println!("Did not find 'two'"),
+    }
 }
