@@ -1,37 +1,31 @@
+use std::rc::Rc;
+
 #[derive(PartialEq)]
 pub struct Str32 {
-    v: Box<[char]>,
+    v: Rc<[char]>,
 }
 
 impl Str32 {
     // Constructor for a new Str32 from a string slice
     pub fn new(s: &str) -> Self {
         let chars: Vec<char> = s.chars().collect();
-        Self {
-            v: chars.into_boxed_slice(),
-        }
+        Self { v: chars.into() }
     }
 
     // Constructor from a String
     pub fn from_string(s: String) -> Self {
         let chars: Vec<char> = s.chars().collect();
-        Self {
-            v: chars.into_boxed_slice(),
-        }
+        Self { v: chars.into() }
     }
 
     // Constructor from a single character
     pub fn from_char(c: char) -> Self {
-        Self {
-            v: vec![c].into_boxed_slice(),
-        }
+        Self { v: vec![c].into() }
     }
 
     // Constructor from a Vec<char>
     pub fn from_vec(chars: Vec<char>) -> Self {
-        Self {
-            v: chars.into_boxed_slice(),
-        }
+        Self { v: chars.into() }
     }
 
     // Returns the length of the string in characters
@@ -62,18 +56,14 @@ impl Str32 {
     pub fn substr(&self, i: usize, j: usize) -> Self {
         let slice = &self.v[i..j];
         let chars: Vec<char> = slice.to_vec();
-        Self {
-            v: chars.into_boxed_slice(),
-        }
+        Self { v: chars.into() }
     }
 
     // Concatenates two Str32 instances
     pub fn add(&self, b: &Self) -> Self {
         let mut result: Vec<char> = self.v.to_vec();
         result.extend(b.v.iter());
-        Self {
-            v: result.into_boxed_slice(),
-        }
+        Self { v: result.into() }
     }
 
     // Returns a new Str32 with all uppercase characters
@@ -84,9 +74,7 @@ impl Str32 {
             .map(|c| c.to_uppercase().next().unwrap_or(*c))
             .collect();
 
-        Self {
-            v: r.into_boxed_slice(),
-        }
+        Self { v: r.into() }
     }
 
     // Returns a new Str32 with all lowercase characters
@@ -97,9 +85,7 @@ impl Str32 {
             .map(|c| c.to_lowercase().next().unwrap_or(*c))
             .collect();
 
-        Self {
-            v: r.into_boxed_slice(),
-        }
+        Self { v: r.into() }
     }
 }
 
