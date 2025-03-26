@@ -12,6 +12,20 @@ impl Str32 {
         }
     }
 
+    // Constructor from a single character
+    pub fn from_char(c: char) -> Self {
+        Self {
+            v: vec![c].into_boxed_slice(),
+        }
+    }
+
+    // Constructor from a Vec<char>
+    pub fn from_vec(chars: Vec<char>) -> Self {
+        Self {
+            v: chars.into_boxed_slice(),
+        }
+    }
+
     // Returns the length of the string in characters
     pub fn len(&self) -> usize {
         self.v.len()
@@ -139,4 +153,13 @@ fn main() {
     let s1_copy = Str32::new("Hello, world!");
     println!("s1 == s1_copy: {}", s1 == s1_copy);
     println!("s1 == s2: {}", s1 == s2);
+
+    // From char
+    let char_str = Str32::from_char('A');
+    println!("From char 'A': {}", char_str);
+
+    // From Vec<char>
+    let vec_chars = vec!['R', 'u', 's', 't'];
+    let vec_str = Str32::from_vec(vec_chars);
+    println!("From Vec<char>: {}", vec_str);
 }
