@@ -37,7 +37,7 @@ impl Str32 {
     }
 
     // Creates a substring from a range of indices
-    pub fn substring(&self, start: usize, end: usize) -> Result<Self, String> {
+    pub fn substr(&self, start: usize, end: usize) -> Result<Self, String> {
         if start > end {
             return Err("Start index must be less than or equal to end index".to_string());
         }
@@ -141,12 +141,12 @@ fn main() {
 
     // Substrings
     println!("\nSubstrings:");
-    match s1.substring(0, 5) {
+    match s1.substr(0, 5) {
         Ok(sub) => println!("s1[0..5]: {}", sub),
         Err(e) => println!("Error: {}", e),
     }
 
-    match s1.substring(7, 5) {
+    match s1.substr(7, 5) {
         Ok(sub) => println!("s1[7..5]: {}", sub),
         Err(e) => println!("Error: {}", e),
     }
