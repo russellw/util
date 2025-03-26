@@ -56,7 +56,7 @@ impl Str32 {
 
         let slice = &self.v[start..end];
         let chars: Vec<char> = slice.to_vec();
-        
+
         Ok(Self {
             v: chars.into_boxed_slice(),
         })
@@ -66,7 +66,7 @@ impl Str32 {
     pub fn concat(&self, other: &Self) -> Self {
         let mut result: Vec<char> = self.v.to_vec();
         result.extend(other.v.iter());
-        
+
         Self {
             v: result.into_boxed_slice(),
         }
@@ -79,10 +79,12 @@ impl Str32 {
 
     // Returns a new Str32 with all uppercase characters
     pub fn to_uppercase(&self) -> Self {
-        let uppercase: Vec<char> = self.v.iter()
+        let uppercase: Vec<char> = self
+            .v
+            .iter()
             .map(|c| c.to_uppercase().next().unwrap_or(*c))
             .collect();
-        
+
         Self {
             v: uppercase.into_boxed_slice(),
         }
@@ -90,10 +92,12 @@ impl Str32 {
 
     // Returns a new Str32 with all lowercase characters
     pub fn to_lowercase(&self) -> Self {
-        let lowercase: Vec<char> = self.v.iter()
+        let lowercase: Vec<char> = self
+            .v
+            .iter()
             .map(|c| c.to_lowercase().next().unwrap_or(*c))
             .collect();
-        
+
         Self {
             v: lowercase.into_boxed_slice(),
         }
