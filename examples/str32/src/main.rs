@@ -69,28 +69,28 @@ impl Str32 {
     }
 
     // Returns a new Str32 with all uppercase characters
-    pub fn to_uppercase(&self) -> Self {
-        let uppercase: Vec<char> = self
+    pub fn upper(&self) -> Self {
+        let r: Vec<char> = self
             .v
             .iter()
             .map(|c| c.to_uppercase().next().unwrap_or(*c))
             .collect();
 
         Self {
-            v: uppercase.into_boxed_slice(),
+            v: r.into_boxed_slice(),
         }
     }
 
     // Returns a new Str32 with all lowercase characters
-    pub fn to_lowercase(&self) -> Self {
-        let lowercase: Vec<char> = self
+    pub fn lower(&self) -> Self {
+        let r: Vec<char> = self
             .v
             .iter()
             .map(|c| c.to_lowercase().next().unwrap_or(*c))
             .collect();
 
         Self {
-            v: lowercase.into_boxed_slice(),
+            v: r.into_boxed_slice(),
         }
     }
 }
@@ -136,8 +136,8 @@ fn main() {
 
     // String manipulations
     println!("\nString manipulations:");
-    println!("s1 uppercase: {}", s1.to_uppercase());
-    println!("s1 lowercase: {}", s1.to_lowercase());
+    println!("s1 uppercase: {}", s1.upper());
+    println!("s1 lowercase: {}", s1.lower());
 
     // Substrings
     println!("\nSubstrings:");
