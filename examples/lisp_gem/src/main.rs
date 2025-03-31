@@ -28,7 +28,7 @@ fn evaluate(value: &LispValue, env: &mut HashMap<String, LispValue>) -> LispResu
                 return Ok(LispValue::List(Vec::new()));
             }
 
-            let head = evaluate(&list[0], env)?;
+            let head = &list[0];
             let tail = &list[1..];
 
             match head {
@@ -44,9 +44,29 @@ fn evaluate(value: &LispValue, env: &mut HashMap<String, LispValue>) -> LispResu
                         }
                     }),
                     "define" => eval_define(tail, env),
-                    _ => Err(LispError::UndefinedSymbol(operator)),
+                    symbol => env.get(symbol).cloned().ok_or(LispError::UndefinedSymbol(symbol.clone())), // Look up other symbols
                 },
-                _ => Err(LispError::TypeMismatch),
+                _ => {
+                    // Evaluate the head in case it's a nested list that evaluates to a function
+                    let evaluated_head = evaluate(head, env)?;
+                    if let LispValue::Symbol(operator) = evaluated_head {
+                        match operator.as_str() {
+                            "+" => eval_arithmetic(tail, env, |a, b| Ok(a + b)),
+                            "-" => eval_arithmetic(tail, env, |a, b| Ok(a - b)),
+                            "*" => eval_arithmetic(tail, env, |a, b| Ok(a * b)),
+                            "/" => eval_arithmetic(tail, env, |a, b| {
+                                if b == 0.0 {
+                                    Err(LispError::DivideByZero)
+                                } else {
+                                    Ok(a / b)
+                                }
+                            }),
+                            _ => Err(LispError::UndefinedSymbol(operator)),
+                        }
+                    } else {
+                        Err(LispError::TypeMismatch) // Head of list is not a symbol
+                    }
+                }
             }
         }
     }
