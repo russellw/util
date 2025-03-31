@@ -33,9 +33,9 @@ fn evaluate(value: &LispValue, env: &mut HashMap<String, LispValue>) -> LispResu
 
             match head {
                 LispValue::Symbol(operator) => match operator.as_str() {
-                    "+" => eval_arithmetic(tail, env, |a, b| a + b),
-                    "-" => eval_arithmetic(tail, env, |a, b| a - b),
-                    "*" => eval_arithmetic(tail, env, |a, b| a * b),
+                    "+" => eval_arithmetic(tail, env, |a, b| Ok(a + b)),
+                    "-" => eval_arithmetic(tail, env, |a, b| Ok(a - b)),
+                    "*" => eval_arithmetic(tail, env, |a, b| Ok(a * b)),
                     "/" => eval_arithmetic(tail, env, |a, b| {
                         if b == 0.0 {
                             Err(LispError::DivideByZero)
@@ -75,7 +75,7 @@ fn eval_define(args: &[LispValue], env: &mut HashMap<String, LispValue>) -> Lisp
     }
     if let LispValue::Symbol(name) = &args[0] {
         let value = evaluate(&args[1], env)?;
-        env.insert(name.clone(), value);
+        env.insert(name.clone(), value.clone());
         Ok(value)
     } else {
         Err(LispError::TypeMismatch)
@@ -83,7 +83,8 @@ fn eval_define(args: &[LispValue], env: &mut HashMap<String, LispValue>) -> Lisp
 }
 
 fn parse(input: &str) -> LispResult {
-    let mut tokens = input.replace("(", " ( ").replace(")", " ) ").split_whitespace().collect::<Vec<&str>>();
+    let replaced = input.replace("(", " ( ").replace(")", " ) ");
+    let mut tokens = replaced.split_whitespace().collect::<Vec<&str>>();
     parse_list(&mut tokens)
 }
 
