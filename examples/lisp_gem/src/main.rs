@@ -44,7 +44,7 @@ fn evaluate(value: &LispValue, env: &mut HashMap<String, LispValue>) -> LispResu
                         }
                     }),
                     "define" => eval_define(tail, env),
-                    symbol => env.get(symbol).cloned().ok_or(LispError::UndefinedSymbol(symbol.clone())), // Look up other symbols
+                    symbol => env.get(symbol).cloned().ok_or(LispError::UndefinedSymbol(symbol.to_string())), // Look up other symbols
                 },
                 _ => {
                     // Evaluate the head in case it's a nested list that evaluates to a function
