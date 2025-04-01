@@ -1,5 +1,5 @@
-# https://stackoverflow.com/questions/33211272/what-is-the-difference-between-non-local-variable-and-global-variable
-
+global foo,bar
+#nonlocal foo - error
 foo = 0 # <- 〇
 def outer():
     foo = 5 # <- ✖
