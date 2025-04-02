@@ -1,5 +1,8 @@
+@echo off
 del /s *.exe
 del /s *.obj
+
+setlocal enabledelayedexpansion
 
 for /d /r %%d in (*) do (
     if exist "%%d\target\" (
@@ -8,3 +11,5 @@ for /d /r %%d in (*) do (
         echo Deleted target directory in "%%d"
     )
 )
+
+endlocal
