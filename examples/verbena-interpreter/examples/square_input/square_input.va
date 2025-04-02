@@ -1,0 +1,4 @@
+prin "Number: "
+x = input()
+x = num(x)
+print x*x
