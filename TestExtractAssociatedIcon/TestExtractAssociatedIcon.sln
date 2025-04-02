@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.7.34221.43
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestExtractAssociatedIcon", "TestExtractAssociatedIcon.csproj", "{26CE93AA-8CEC-4998-9AC8-48B4AC400FAA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{26CE93AA-8CEC-4998-9AC8-48B4AC400FAA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{26CE93AA-8CEC-4998-9AC8-48B4AC400FAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{26CE93AA-8CEC-4998-9AC8-48B4AC400FAA}.Debug|x64.ActiveCfg = Debug|x64
+		{26CE93AA-8CEC-4998-9AC8-48B4AC400FAA}.Debug|x64.Build.0 = Debug|x64
+		{26CE93AA-8CEC-4998-9AC8-48B4AC400FAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{26CE93AA-8CEC-4998-9AC8-48B4AC400FAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{26CE93AA-8CEC-4998-9AC8-48B4AC400FAA}.Release|x64.ActiveCfg = Release|x64
+		{26CE93AA-8CEC-4998-9AC8-48B4AC400FAA}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {3A462E18-9681-4DD6-AC99-200DA16767DE}
+	EndGlobalSection
+EndGlobal
