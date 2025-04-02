@@ -1,0 +1,79 @@
+diff --git a/grid_names_icons.py b/grid_names_icons.py
+index c774d39..ea6ec83 100644
+--- a/grid_names_icons.py
++++ b/grid_names_icons.py
+@@ -1,12 +1,14 @@
+ import tkinter as tk
+ from tkinter import Canvas, Frame, Scrollbar, Label
++from PIL import Image, ImageTk
+ 
+-class DynamicGridApp:
+-    def __init__(self, root, items, padding=10, cell_width=200):
++class DynamicIconGridApp:
++    def __init__(self, root, items, padding=10, cell_width=200, cell_height=100):
+         self.root = root
+         self.items = items
+         self.padding = padding
+         self.cell_width = cell_width
++        self.cell_height = cell_height
+ 
+         # Setup the scrolling canvas
+         self.canvas = Canvas(root)
+@@ -26,12 +28,19 @@ class DynamicGridApp:
+         self.canvas.pack(side="left", fill="both", expand=True)
+         self.scrollbar.pack(side="right", fill="y")
+ 
++        self.load_icons()  # Load icons
+         self.root.after(100, self.populate_grid)
+         self.root.bind("<Configure>", self.on_resize)
+ 
++    def load_icons(self):
++        for item in self.items:
++            if 'icon_path' in item:
++                image = Image.open(item['icon_path'])
++                image = image.resize((self.cell_width - 2*self.padding, int(self.cell_height*0.6)), Image.ANTIALIAS)
++                item['icon'] = ImageTk.PhotoImage(image)
++
+     def calculate_columns(self):
+-        # Ensure the width used for calculation is greater than the cell width
+-        current_width = self.canvas.winfo_width()  # Use the canvas width which is more reliable for grid layout
++        current_width = self.canvas.winfo_width()
+         columns = max(1, current_width // (self.cell_width + 2 * self.padding))
+         return columns
+ 
+@@ -47,10 +56,10 @@ class DynamicGridApp:
+                 row += 1
+                 col = 0
+ 
+-            frame = Frame(self.scrollable_frame, height=50, width=self.cell_width)
++            frame = Frame(self.scrollable_frame, height=self.cell_height, width=self.cell_width)
+             frame.grid(row=row, column=col, padx=self.padding, pady=self.padding)
+             frame.pack_propagate(False)
+-            label = Label(frame, text=item['name'])
++            label = Label(frame, text=item['name'], image=item.get('icon', None), compound="top")
+             label.pack(fill="both", expand=True)
+ 
+             col += 1
+@@ -61,10 +70,16 @@ class DynamicGridApp:
+ 
+ if __name__ == "__main__":
+     root = tk.Tk()
+-    root.title("Dynamic Grid of Names")
+-    root.geometry("600x400")  # Set initial size
+-
+-    items = [{'name': 'Item 1'}, {'name': 'Item 2'}, {'name': 'Item 3'}, {'name': 'Item 4'}]
+-
+-    app = DynamicGridApp(root, items)
++    root.title("Dynamic Icon Grid")
++    root.geometry("800x600")  # Set initial size
++
++    # Example items: Specify correct paths to your icon images
++    items = [
++        {'name': 'Item 1', 'icon_path': 'path/to/icon1.png'},
++        {'name': 'Item 2', 'icon_path': 'path/to/icon2.png'},
++        {'name': 'Item 3', 'icon_path': 'path/to/icon3.png'},
++        {'name': 'Item 4', 'icon_path': 'path/to/icon4.png'}
++    ]
++
++    app = DynamicIconGridApp(root, items)
+     root.mainloop()
