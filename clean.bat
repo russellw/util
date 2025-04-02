@@ -11,5 +11,12 @@ for /d /r %%d in (*) do (
         echo Deleted target directory in "%%d"
     )
 )
+for /d /r %%d in (*) do (
+    if exist "%%d\__pycache__\" (
+        echo Found __pycache__ directory in "%%d"
+        rmdir /s /q "%%d\__pycache__"
+        echo Deleted __pycache__ directory in "%%d"
+    )
+)
 
 endlocal
