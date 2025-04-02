@@ -1,0 +1,22 @@
+﻿<Window x:Class="TypingAssist.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Typing Assist Program Benchmark" Height="600" Width="800">
+    <Grid>
+        <TextBox Name="textBox" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto" 
+                 TextWrapping="Wrap" AcceptsReturn="True" Height="400" Width="750" Margin="10,10,10,0" 
+                 KeyUp="TextBox_KeyUp"/>
+        <Button Name="startButton" Content="Start Insertion" Height="30" Width="100" 
+                Margin="10,420,0,0" VerticalAlignment="Top" HorizontalAlignment="Left" 
+                Click="StartButton_Click"/>
+        <Label Name="resultLabel" Margin="120,420,0,0" VerticalAlignment="Top" HorizontalAlignment="Left"/>
+        <ListBox Name="suggestionBox" Height="100" Width="100" Visibility="Collapsed" 
+                 Margin="0,0,0,0">
+            <ListBoxItem Content="1. Lenovo"/>
+            <ListBoxItem Content="2. HP"/>
+            <ListBoxItem Content="3. Dell"/>
+            <ListBoxItem Content="4. Apple"/>
+            <ListBoxItem Content="5. Asus"/>
+        </ListBox>
+    </Grid>
+</Window>
