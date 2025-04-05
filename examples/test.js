@@ -1,9 +1,11 @@
+'use strict';
+
 function f(){
 }
 
 console.log(f())
 
-
+var a,m;
 for (a in 'abc') {
 console.log(a)
 }
@@ -22,3 +24,7 @@ console.log(m)
 for (a of m) {
 console.log(a)
 }
+
+console.log(665)
+return 5
+console.log(666)
