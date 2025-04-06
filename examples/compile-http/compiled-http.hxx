@@ -1,0 +1,1 @@
+extern const unsigned char faviconData[2484];

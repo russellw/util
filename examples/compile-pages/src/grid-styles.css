@@ -1,0 +1,6 @@
+.grid2{
+display:grid;
+column-gap:6px;
+row-gap:12px;
+grid-template-columns:max-content max-content;
+}
