@@ -1,0 +1,8 @@
+[package]
+name = "green_circle_gem"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+image = "0.25" # Check for the latest version on crates.io
+imageproc = "0.25" # Should often match the image crate version
