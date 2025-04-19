@@ -1,7 +1,7 @@
 // src/logger.js
 // This module imports from math.js
 
-import { add, PI } from './math.js';
+import { add, PI } from './math.mjs';
 
 class Logger {
   constructor(prefix = '') {

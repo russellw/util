@@ -2,14 +2,14 @@
 // This imports from both modules
 
 // Import default export from logger.js
-import Logger from './logger.js';
+import Logger from './logger.mjs';
 
 // Import named exports
-import { logMathOperation } from './logger.js';
-import { multiply } from './math.js';
+import { logMathOperation } from './logger.mjs';
+import { multiply } from './math.mjs';
 
 // Import both default and named exports from math.js
-import calculator, { add } from './math.js';
+import calculator, { add } from './math.mjs';
 
 // Create a logger instance
 const logger = new Logger('MAIN: ');
