@@ -8,6 +8,8 @@ import Logger from './logger.js';
 import { logMathOperation } from './logger.js';
 import { multiply } from './math.js';
 
+import adder from './adder.js';
+
 // Import both default and named exports from math.js
 import calculator, { add } from './math.js';
 
@@ -22,7 +24,8 @@ logMathOperation();
 
 // Use functions from math module
 logger.log(`4 × 6 = ${multiply(4, 6)}`);
-logger.log(`10 + 20 = ${add(10, 20)}`);
+//logger.log(`10 + 20 = ${adder.add(10, 20)}`);
+logger.log(`10 + 20 = ${adder['add'](10, 20)}`);
 
 // Use the default export from math module
 logger.log(`5² = ${calculator.square(5)}`);
