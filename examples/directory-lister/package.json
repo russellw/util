@@ -1,0 +1,12 @@
+{
+  "name": "directory-lister",
+  "version": "1.0.0",
+  "description": "Lists files in the current directory",
+  "main": "list-files.js",
+  "type": "module",
+  "scripts": {
+    "start": "node list-files.js"
+  },
+  "author": "",
+  "license": "ISC"
+}
