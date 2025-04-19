@@ -1,0 +1,7 @@
+        {
+            "domain": "nowhere",
+            "name": "Test User",
+            "email": "testuser@example.com",
+            "phone": "123-456-7890",
+            "message": "This is a test message from test-api."
+        }
