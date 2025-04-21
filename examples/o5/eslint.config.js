@@ -6,10 +6,7 @@ import { fileURLToPath } from "node:url"
 const gitignorePath = fileURLToPath(new URL(".gitignore", import.meta.url))
 
 export default [
-	// Include gitignore patterns first
 	includeIgnoreFile(gitignorePath),
-
-	// Your existing configuration
 	js.configs.recommended,
 	{
 		files: ["**/*.js"],
@@ -24,8 +21,6 @@ export default [
 		},
 		rules: {
 			curly: ["error", "all"],
-			// Other rules...
 		},
 	},
-	// Any other configuration objects you had before
 ]
