@@ -38,3 +38,4 @@ target/
 *.o
 build.ninja
 .ninja_log
+node_modules/
