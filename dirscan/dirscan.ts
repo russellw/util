@@ -210,7 +210,7 @@ function scanDirectory(dir: string, currentDepth: number = 0, totalDepth: number
 }
 
 // Main execution function
-async function main() {
+function main(): void {
   console.log("Starting directory scan...");
   const startTime = Date.now();
   
@@ -328,7 +328,4 @@ async function main() {
 }
 
 // Run the program
-main().catch(err => {
-  console.error("Fatal error:", err);
-  process.exit(1);
-});
+main();

@@ -1,15 +1,23 @@
 {
   "name": "dirscan",
   "version": "1.0.0",
-  "type": "module",
   "description": "Directory statistics scanner",
-  "main": "dirscan.ts",
+  "main": "dist/dirscan.js",
   "scripts": {
+    "build": "tsc",
     "start": "ts-node dirscan.ts"
   },
+  "keywords": [
+    "directory",
+    "scanner",
+    "statistics",
+    "files"
+  ],
+  "author": "",
+  "license": "MIT",
   "dependencies": {
-    "@types/node": "^22.15.17",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.8.3"
+    "typescript": "^5.0.0",
+    "ts-node": "^10.9.0",
+    "@types/node": "^18.0.0"
   }
 }
