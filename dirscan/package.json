@@ -1,4 +1,12 @@
 {
+  "name": "dirscan",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Directory statistics scanner",
+  "main": "dirscan.ts",
+  "scripts": {
+    "start": "ts-node dirscan.ts"
+  },
   "dependencies": {
     "@types/node": "^22.15.17",
     "ts-node": "^10.9.2",
