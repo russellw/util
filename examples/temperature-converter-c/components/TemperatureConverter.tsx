@@ -1,19 +1,24 @@
 "use client"
 
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
 
 const TemperatureConverter = () => {
   const [temperature, setTemperature] = useState('');
   const [fromUnit, setFromUnit] = useState('celsius');
-  const [result, setResult] = useState(null);
+  const [result, setResult] = useState<{
+    original: number;
+    converted: string;
+    fromUnit: string;
+    targetUnit: string;
+  } | null>(null);
   const [error, setError] = useState('');
 
-  const handleTemperatureChange = (e) => {
+  const handleTemperatureChange = (e: ChangeEvent<HTMLInputElement>) => {
     setTemperature(e.target.value);
     setError('');
   };
 
-  const handleUnitChange = (e) => {
+  const handleUnitChange = (e: ChangeEvent<HTMLSelectElement>) => {
     setFromUnit(e.target.value);
     setError('');
   };
