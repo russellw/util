@@ -1,3 +1,6 @@
+// Import the temperature converter component
+import TemperatureConverter from '../components/TemperatureConverter';
+
 export default function Home() {
   return (
     <main>
@@ -5,6 +8,3 @@ export default function Home() {
     </main>
   );
 }
-
-// Import the temperature converter component
-import TemperatureConverter from '../components/TemperatureConverter';
