@@ -18,5 +18,12 @@ for /d /r %%d in (*) do (
         echo Deleted __pycache__ directory in "%%d"
     )
 )
+for /d /r %%d in (*) do (
+    if exist "%%d\node_modules\" (
+        echo Found node_modules directory in "%%d"
+        rmdir /s /q "%%d\node_modules"
+        echo Deleted node_modules directory in "%%d"
+    )
+)
 
 endlocal
