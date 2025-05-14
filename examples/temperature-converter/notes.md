@@ -43,6 +43,7 @@ found 0 vulnerabilities
 Success! Created temperature-converter at C:\util\examples\temperature-converter
 
 
+npm run build
 npm run dev
 http://localhost:3000
 
