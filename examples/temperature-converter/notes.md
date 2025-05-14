@@ -1,4 +1,6 @@
-11:45 PM Tuesday, May 13, 2025
+https://nextjs.org/docs/app/getting-started/installation
+
+
 C:\util\examples>npx create-next-app@latest
 √ What is your project named? ... temperature-converter
 √ Would you like to use TypeScript? ... Yes
@@ -39,3 +41,9 @@ added 389 packages, and audited 390 packages in 54s
 
 found 0 vulnerabilities
 Success! Created temperature-converter at C:\util\examples\temperature-converter
+
+
+npm run dev
+http://localhost:3000
+
+app\page.tsx
